@@ -1,0 +1,12 @@
+{
+	"code": [
+		"UtilsPlugin.h",
+		"UtilsPlugin.mm"
+	],
+	"frameworks": [
+	],
+	"userDefined": [
+	],
+	"plist": {
+	}
+}
