@@ -37,6 +37,14 @@ var Utils = Class(function () {
 	this.init = function(opts) {
 		logger.log("{utils} Registering for events on startup");
 	}
+	
+	this.shareText = function(message) {
+		logger.log("{utils} Sharing Love");
+
+		var parameters = {"message":message};
+
+		pluginSend("shareText", parameters);
+	}
 
 });
 

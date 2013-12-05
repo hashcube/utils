@@ -16,20 +16,29 @@
 	return self;
 }
 
-- (void)shareText:(NSString *)string andImage:(UIImage *)image
-{
+- (void)shareText:(NSDictionary *)jsonObject {
+    NSString *shareText =  [NSString stringWithFormat:@""];
+    NSString *url = [NSString stringWithFormat:@"http://www.sudokuquest.com"];
+    
+    for (id key in jsonObject) {
+        id o = [jsonObject objectForKey:key];
+        if([key isEqual:@"message"]){
+            shareText = o;
+            continue;
+        }
+        if([key isEqual:@"url"]){
+            url = o;
+            continue;
+        }
+    }
+    NSURL *shareURL = [NSURL URLWithString:url];
     NSMutableArray *sharingItems = [NSMutableArray new];
-
-    if (string) {
-        [sharingItems addObject:string];
-    }
-    if (image) {
-        [sharingItems addObject:image];
-    }
-
+    [sharingItems addObject:shareText];
+    [sharingItems addObject:shareURL];
     UIActivityViewController *activityController = [[UIActivityViewController alloc] initWithActivityItems:sharingItems applicationActivities:nil];
-    [self presentViewController:activityController animated:YES completion:nil];
+    UIWindow *window = [[UIApplication sharedApplication] keyWindow];
+    UIViewController *topView = window.rootViewController;
+    [topView presentViewController:activityController animated:YES completion:nil];
 }
 
 @end
-
