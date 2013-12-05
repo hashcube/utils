@@ -38,10 +38,10 @@ var Utils = Class(function () {
 		logger.log("{utils} Registering for events on startup");
 	}
 	
-	this.shareText = function(message) {
+	this.shareText = function(message, url) {
 		logger.log("{utils} Sharing Love");
 
-		var parameters = {"message":message};
+		var parameters = {"message":message,"url":url};
 
 		pluginSend("shareText", parameters);
 	}
