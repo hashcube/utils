@@ -6,10 +6,14 @@ import com.tealeaf.EventQueue;
 import com.tealeaf.plugin.IPlugin;
 
 import android.os.Bundle;
+import android.os.Build.*;
+import android.os.Build.VERSION.*;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.Context;
 import android.net.Uri;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
 
 import java.util.Iterator;
 
@@ -19,6 +23,32 @@ import org.json.JSONObject;
 public class UtilsPlugin implements IPlugin {
 	Context _context;
 	Activity _activity;
+
+	public class DeviceEvent extends com.tealeaf.event.Event {
+		String type;
+		String os;
+		String device;
+		String versionNumber;
+
+		public DeviceEvent(Context context) {
+			super("deviceInfo");
+			PackageManager packageManager = context.getPackageManager();
+			String packageName = context.getPackageName();
+			String myVersionName = "not available";
+			try {
+			    myVersionName = packageManager.getPackageInfo(packageName, 0).versionName;
+			} catch (PackageManager.NameNotFoundException e) {
+			    e.printStackTrace();
+			}
+			this.type = "android";
+			if (android.os.Build.BRAND.equalsIgnoreCase("Amazon")) {
+				this.type = "kindle";
+			}
+			this.os = android.os.Build.VERSION.RELEASE;
+			this.device = android.os.Build.MODEL;
+			this.versionNumber = myVersionName;
+		}
+	}
 
 	public UtilsPlugin() {
 	}
@@ -65,6 +95,10 @@ public class UtilsPlugin implements IPlugin {
 
 	public void logError(String errorDesc) {
 		logger.log("{utils-native} logError "+ errorDesc);
+	}
+
+	public void getDevice(String dummy) {
+		EventQueue.pushEvent(new DeviceEvent(_context));
 	}
 
     public void shareText(String param) {

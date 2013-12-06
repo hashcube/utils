@@ -33,9 +33,16 @@ function invokeCallbacks(list, clear) {
 }
 
 var Utils = Class(function () {
+	var infoCB = [];
 
 	this.init = function(opts) {
 		logger.log("{utils} Registering for events on startup");
+
+		pluginOn("deviceInfo", function(evt) {
+			logger.log("{utils} Device Info Received:", JSON.stringify(evt));
+
+			invokeCallbacks(infoCB, true, evt);
+		});
 	}
 	
 	this.shareText = function(message, url) {
@@ -44,6 +51,14 @@ var Utils = Class(function () {
 		var parameters = {"message":message,"url":url};
 
 		pluginSend("shareText", parameters);
+	}
+
+	this.getDevice = function(next) {
+		logger.log("{utils} Getting Device Details");
+
+		infoCB.push(next);
+
+		pluginSend("getDevice");
 	}
 
 });
