@@ -16,6 +16,16 @@
 	return self;
 }
 
+- (void)getDevice:(NSDictionary *)jsonObject {
+    [[PluginManager get] dispatchJSEvent:[NSDictionary dictionaryWithObjectsAndKeys:
+                                                  @"deviceInfo",@"name",
+                                                  [[UIDevice currentDevice] platformString],@"device",
+                                                  @"ios",@"type",
+                                                  [[UIDevice currentDevice] systemVersion],@"os",
+                                                  [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"],@"versionNumber",
+                                                  nil]];
+}
+
 - (void)shareText:(NSDictionary *)jsonObject {
     NSString *shareText =  [NSString stringWithFormat:@""];
     NSString *url = [NSString stringWithFormat:@"http://www.sudokuquest.com"];
