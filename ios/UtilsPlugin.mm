@@ -17,9 +17,18 @@
 }
 
 - (void)getDevice:(NSDictionary *)jsonObject {
+    NSString *m_platform = 0;
+    size_t size;
+    sysctlbyname("hw.machine", NULL, &size, NULL, 0);
+    char *machine = (char*)malloc(size + 1);
+    sysctlbyname("hw.machine", machine, &size, NULL, 0);
+    machine[size] = '\0';
+    m_platform = [NSString stringWithUTF8String:machine];
+    free(machine);
+
     [[PluginManager get] dispatchJSEvent:[NSDictionary dictionaryWithObjectsAndKeys:
                                                   @"deviceInfo",@"name",
-                                                  [[UIDevice currentDevice] platformString],@"device",
+                                                  m_platform,@"device",
                                                   @"ios",@"type",
                                                   [[UIDevice currentDevice] systemVersion],@"os",
                                                   [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"],@"versionNumber",
