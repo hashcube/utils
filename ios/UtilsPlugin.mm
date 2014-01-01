@@ -1,4 +1,5 @@
 #import "UtilsPlugin.h"
+#import <sys/sysctl.h>
 
 @implementation UtilsPlugin
 
