@@ -30,6 +30,7 @@
                                                   @"deviceInfo",@"name",
                                                   m_platform,@"device",
                                                   @"ios",@"type",
+                                                  @"ios",@"store",
                                                   [[UIDevice currentDevice] systemVersion],@"os",
                                                   [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"],@"versionNumber",
                                                   nil]];
