@@ -61,6 +61,10 @@ var Utils = Class(function () {
 		pluginSend("getDevice");
 	}
 
+	this.logIt = function(stringData){
+		logger.log("{utils} LogIT: "+ stringData+" |||");
+	}
+
 });
 
 exports = new Utils();
