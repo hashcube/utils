@@ -48,7 +48,7 @@ public class UtilsPlugin implements IPlugin {
 			try {
                 if ("com.amazon.venezia".equals(packageManager.getInstallerPackageName(packageName))) {
                     // App was installed by Amazon App Store
-                    deviceIs = "kindle";
+                    this.store = "kindle";
                 }
                 else if("com.android.vending".equals(packageManager.getInstallerPackageName(packageName))) {
                         // App was installed by Google Play Store
