@@ -119,6 +119,25 @@ public class UtilsPlugin implements IPlugin {
 		EventQueue.pushEvent(new DeviceEvent(_context));
 	}
 
+	public void logIt(String json) {
+		String shareText = "";
+	    try {
+	    	JSONObject ogData = new JSONObject(json);
+	        Iterator<?> keys = ogData.keys();
+	        while( keys.hasNext() ){
+	            String key = (String)keys.next();
+	    		Object o = ogData.get(key);
+	    		if(key.equals("message")){
+	    			shareText = (String) o;
+	    			continue;
+	    		}
+	        }
+		} catch(JSONException e) {
+			logger.log("{utils-native} Error in Params of logIt because "+ e.getMessage());
+		}
+		logger.log("{utils} LOGIT = "+ shareText);
+	}
+
     public void shareText(String param) {
     	logger.log("{utils-native} Inside shareText");
 	    String shareText = "", shareURL = "";

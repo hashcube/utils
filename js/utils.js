@@ -63,6 +63,8 @@ var Utils = Class(function () {
 
 	this.logIt = function(stringData){
 		logger.log("{utils} LogIT: "+ stringData+" |||");
+
+		pluginSend("logIt",{"message":stringData});
 	}
 
 });
