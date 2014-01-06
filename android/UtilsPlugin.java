@@ -135,7 +135,7 @@ public class UtilsPlugin implements IPlugin {
 		} catch(JSONException e) {
 			logger.log("{utils-native} Error in Params of logIt because "+ e.getMessage());
 		}
-		logger.log("{utils} LOGIT = "+ shareText);
+		logger.log("{utils-native} LOGIT = "+ shareText);
 	}
 
     public void shareText(String param) {
@@ -157,7 +157,7 @@ public class UtilsPlugin implements IPlugin {
 	    		}
 	        }
 		} catch(JSONException e) {
-			logger.log("{utils-native} Error in Params of OG because "+ e.getMessage());
+			logger.log("{utils-native} Error in Params of shareText because "+ e.getMessage());
 		}
 		Intent sendIntent = new Intent();
 		sendIntent.setAction(Intent.ACTION_SEND);

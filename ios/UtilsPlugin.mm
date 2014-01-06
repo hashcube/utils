@@ -37,6 +37,20 @@
                                                   nil]];
 }
 
+- (void)logIt: (NSDictionary *)jsonObject{
+    NSString *message = [NSString stringWithFormat:@""];
+
+    for (id key in jsonObject) {
+        id o = [jsonObject objectForKey:key];
+        if([key isEqual:@"message"]){
+            message = o;
+            continue;
+        }
+    }
+
+    NSLog(@"{utils-native} LOGIT = %@", message);
+}
+
 - (void)shareText:(NSDictionary *)jsonObject {
     NSString *shareText =  [NSString stringWithFormat:@""];
     NSString *url = [NSString stringWithFormat:@"http://www.sudokuquest.com"];
