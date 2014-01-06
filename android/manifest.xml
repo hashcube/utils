@@ -1,4 +1,6 @@
 <!--START_PLUGINS_MANIFEST-->
 <!--END_PLUGINS_MANIFEST-->
 <!--START_PLUGINS_APPLICATION-->
+	<!--UTILS-->
+	<meta-data android:name="INSTALL_STORE" android:value=""/>
 <!--END_PLUGINS_APPLICATION-->
