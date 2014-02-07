@@ -153,7 +153,7 @@ public class UtilsPlugin implements IPlugin {
 		}
 		Intent sendIntent = new Intent();
 		sendIntent.setAction(Intent.ACTION_SEND);
-		sendIntent.putExtra(Intent.EXTRA_TEXT, shareText + "\n" + shareURL);
+		sendIntent.putExtra(Intent.EXTRA_TEXT, shareText + " : (" + shareURL + ") #sudoku #sudokuquest");
 		sendIntent.setType("text/plain");
 		_activity.startActivity(Intent.createChooser(sendIntent, "Spread the word"));
 	}

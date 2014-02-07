@@ -66,6 +66,7 @@
             continue;
         }
     }
+    shareText = [shareText stringByAppendingString:@" : #sudoku #sudokuquest "];
     NSURL *shareURL = [NSURL URLWithString:url];
     NSMutableArray *sharingItems = [NSMutableArray new];
     [sharingItems addObject:shareText];
