@@ -45,18 +45,22 @@ public class UtilsPlugin implements IPlugin {
 			if (android.os.Build.BRAND.equalsIgnoreCase("Amazon")) {
 				this.type = "kindle";
 			}
+			this.os = android.os.Build.VERSION.RELEASE;
+			this.device = android.os.Build.MODEL;
+			this.versionNumber = myVersionName;
 			try{
 				Bundle meta = packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA).metaData;
 				if (meta != null) {
-					this.store = meta.get("INSTALL_STORE").toString();
+					this.store = meta.get("INSTALL_STORE").toString();					
 				}
 			} catch (Exception e) {
 				logger.log("{utils-native} Exception on start:", e.getMessage());
 			}
-
-			this.os = android.os.Build.VERSION.RELEASE;
-			this.device = android.os.Build.MODEL;
-			this.versionNumber = myVersionName;
+			if(this.store.equals("nokia")){
+				this.os = "Android 4.1.2";
+				this.device = "Nokia X";
+				this.type = "nokia";
+			}
 		}
 	}
 
