@@ -57,8 +57,8 @@ public class UtilsPlugin implements IPlugin {
 				logger.log("{utils-native} Exception on start:", e.getMessage());
 			}
 			if(this.store.equals("nokia")){
-				this.os = "Android 4.1.2";
-				this.device = "Nokia X";
+				this.os = "Android4.1.2";
+				this.device = "NokiaX";
 				this.type = "nokia";
 			}
 		}
