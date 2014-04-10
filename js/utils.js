@@ -33,7 +33,8 @@ function invokeCallbacks(list, clear) {
 }
 
 var Utils = Class(function () {
-	var infoCB = [];
+	var infoCB = [],
+	    jbCB = [];
 
 	this.init = function(opts) {
 		logger.log("{utils} Registering for events on startup");
@@ -42,6 +43,12 @@ var Utils = Class(function () {
 			logger.log("{utils} Device Info Received:", JSON.stringify(evt));
 
 			invokeCallbacks(infoCB, true, evt);
+		});
+
+		pluginOn("utilsJailBroken", function(evt) {
+			logger.log("{utils} isJailBroken:", JSON.stringify(evt));
+
+			invokeCallbacks(jbCB, true, evt.jb);
 		});
 	}
 	
@@ -65,6 +72,14 @@ var Utils = Class(function () {
 		logger.log("{utils} LogIT: "+ stringData+" |||");
 
 		pluginSend("logIt",{"message":stringData});
+	}
+
+	this.isJailBroken = function(next) {
+		logger.log("{utils} isJailBroken check");
+
+		jbCB.push(next);
+
+		pluginSend("isJailBroken");
 	}
 
 });

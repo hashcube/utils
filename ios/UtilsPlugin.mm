@@ -18,63 +18,113 @@
 }
 
 - (void)getDevice:(NSDictionary *)jsonObject {
-    NSString *m_platform = 0;
-    size_t size;
-    sysctlbyname("hw.machine", NULL, &size, NULL, 0);
-    char *machine = (char*)malloc(size + 1);
-    sysctlbyname("hw.machine", machine, &size, NULL, 0);
-    machine[size] = '\0';
-    m_platform = [NSString stringWithUTF8String:machine];
-    free(machine);
+	NSString *m_platform = 0;
+	size_t size;
+	sysctlbyname("hw.machine", NULL, &size, NULL, 0);
+	char *machine = (char*)malloc(size + 1);
+	sysctlbyname("hw.machine", machine, &size, NULL, 0);
+	machine[size] = '\0';
+	m_platform = [NSString stringWithUTF8String:machine];
+	free(machine);
 
-    [[PluginManager get] dispatchJSEvent:[NSDictionary dictionaryWithObjectsAndKeys:
-                                                  @"deviceInfo",@"name",
-                                                  m_platform,@"device",
-                                                  @"ios",@"type",
-                                                  @"ios",@"store",
-                                                  [[UIDevice currentDevice] systemVersion],@"os",
-                                                  [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"],@"versionNumber",
-                                                  nil]];
+	[[PluginManager get] dispatchJSEvent:[NSDictionary dictionaryWithObjectsAndKeys:
+		@"deviceInfo",@"name",
+		m_platform,@"device",
+		@"ios",@"type",
+		@"ios",@"store",
+		[[UIDevice currentDevice] systemVersion],@"os",
+		[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"],@"versionNumber",
+		nil]];
 }
 
 - (void)logIt: (NSDictionary *)jsonObject{
-    NSString *message = [NSString stringWithFormat:@""];
+	NSString *message = [NSString stringWithFormat:@""];
 
-    for (id key in jsonObject) {
-        id o = [jsonObject objectForKey:key];
-        if([key isEqual:@"message"]){
-            message = o;
-            continue;
-        }
-    }
+	for (id key in jsonObject) {
+		id o = [jsonObject objectForKey:key];
+		if([key isEqual:@"message"]){
+			message = o;
+			continue;
+		}
+	}
 
-    NSLog(@"{utils-native} LOGIT = %@", message);
+	NSLog(@"{utils-native} LOGIT = %@", message);
 }
 
 - (void)shareText:(NSDictionary *)jsonObject {
-    NSString *shareText =  [NSString stringWithFormat:@""];
-    NSString *url = [NSString stringWithFormat:@"http://www.sudokuquest.com"];
+	NSString *shareText =  [NSString stringWithFormat:@""];
+	NSString *url = [NSString stringWithFormat:@"http://www.sudokuquest.com"];
+
+	for (id key in jsonObject) {
+		id o = [jsonObject objectForKey:key];
+		if([key isEqual:@"message"]){
+			shareText = o;
+			continue;
+		}
+		if([key isEqual:@"url"]){
+			url = o;
+			continue;
+		}
+	}
+	shareText = [shareText stringByAppendingString:@" : #sudoku #sudokuquest "];
+	NSURL *shareURL = [NSURL URLWithString:url];
+	NSMutableArray *sharingItems = [NSMutableArray new];
+	[sharingItems addObject:shareText];
+	[sharingItems addObject:shareURL];
+	UIActivityViewController *activityController = [[UIActivityViewController alloc] initWithActivityItems:sharingItems applicationActivities:nil];
+	UIWindow *window = [[UIApplication sharedApplication] keyWindow];
+	UIViewController *topView = window.rootViewController;
+	[topView presentViewController:activityController animated:YES completion:nil];
+}
+
+/* Code adapted from
+ * http://resources.infosecinstitute.com/ios-application-security-part-23-jailbreak-detection-evasion/
+ */
+- (void)isJailBroken:(NSDictionary *)jsonObject {
     
-    for (id key in jsonObject) {
-        id o = [jsonObject objectForKey:key];
-        if([key isEqual:@"message"]){
-            shareText = o;
-            continue;
-        }
-        if([key isEqual:@"url"]){
-            url = o;
-            continue;
-        }
-    }
-    shareText = [shareText stringByAppendingString:@" : #sudoku #sudokuquest "];
-    NSURL *shareURL = [NSURL URLWithString:url];
-    NSMutableArray *sharingItems = [NSMutableArray new];
-    [sharingItems addObject:shareText];
-    [sharingItems addObject:shareURL];
-    UIActivityViewController *activityController = [[UIActivityViewController alloc] initWithActivityItems:sharingItems applicationActivities:nil];
-    UIWindow *window = [[UIApplication sharedApplication] keyWindow];
-    UIViewController *topView = window.rootViewController;
-    [topView presentViewController:activityController animated:YES completion:nil];
+    //By default device is not jailbroken
+	BOOL jailBroken = NO;
+#if !(TARGET_IPHONE_SIMULATOR)
+	if ([[NSFileManager defaultManager] 
+			fileExistsAtPath:@"/Applications/Cydia.app"]) {
+		jailBroken = YES;
+	} else if([[NSFileManager defaultManager] 
+			fileExistsAtPath:@"/Library/MobileSubstrate/MobileSubstrate.dylib"]) {
+		jailBroken = YES;
+	} else if([[NSFileManager defaultManager] 
+			fileExistsAtPath:@"/bin/bash"]) {
+		jailBroken = YES;
+	} else if([[NSFileManager defaultManager] 
+			fileExistsAtPath:@"/usr/sbin/sshd"]) {
+		jailBroken = YES;
+	} else if([[NSFileManager defaultManager] 
+			fileExistsAtPath:@"/etc/apt"]) {
+		jailBroken = YES;
+	}
+
+	NSError *error;
+	NSString *stringToBeWritten = @"This is a test.";
+	[stringToBeWritten writeToFile:@"/private/jailbreak.txt" atomically:YES
+		encoding:NSUTF8StringEncoding error:&error];
+	if(error == nil) {
+		//Device is jailbroken
+		jailBroken = YES;
+	} else {
+		[[NSFileManager defaultManager] removeItemAtPath:@"/private/jailbreak.txt" error:nil];
+	}
+
+	if([[UIApplication sharedApplication] 
+			canOpenURL:[NSURL URLWithString:@"cydia://package/com.example.package"]]) {
+		//Device is jailbroken
+		jailBroken = YES;
+	}
+#endif
+
+    NSString *ret = (jailBroken)? @"true": @"false";
+	[[PluginManager get] dispatchJSEvent:[NSDictionary dictionaryWithObjectsAndKeys:
+        @"utilsJailBroken",@"name",
+		ret,@"jb",
+		nil]];
 }
 
 @end

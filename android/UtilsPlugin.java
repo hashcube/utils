@@ -117,41 +117,41 @@ public class UtilsPlugin implements IPlugin {
 
 	public void logIt(String json) {
 		String shareText = "";
-	    try {
-	    	JSONObject ogData = new JSONObject(json);
-	        Iterator<?> keys = ogData.keys();
-	        while( keys.hasNext() ){
-	            String key = (String)keys.next();
-	    		Object o = ogData.get(key);
-	    		if(key.equals("message")){
-	    			shareText = (String) o;
-	    			continue;
-	    		}
-	        }
+		try {
+			JSONObject ogData = new JSONObject(json);
+			Iterator<?> keys = ogData.keys();
+			while( keys.hasNext() ){
+				String key = (String)keys.next();
+				Object o = ogData.get(key);
+				if(key.equals("message")){
+					shareText = (String) o;
+					continue;
+				}
+			}
 		} catch(JSONException e) {
 			logger.log("{utils-native} Error in Params of logIt because "+ e.getMessage());
 		}
 		logger.log("{utils-native} LOGIT = "+ shareText);
 	}
 
-    public void shareText(String param) {
-    	logger.log("{utils-native} Inside shareText");
-	    String shareText = "", shareURL = "";
-	    try {
-	    	JSONObject ogData = new JSONObject(param);	
-	        Iterator<?> keys = ogData.keys();
-	        while( keys.hasNext() ){
-	            String key = (String)keys.next();
-	    		Object o = ogData.get(key);
-	    		if(key.equals("message")){
-	    			shareText = (String) o;
-	    			continue;
-	    		}
-	    		if(key.equals("url")){
-	    			shareURL = (String) o;
-	    			continue;
-	    		}
-	        }
+	public void shareText(String param) {
+		logger.log("{utils-native} Inside shareText");
+		String shareText = "", shareURL = "";
+		try {
+			JSONObject ogData = new JSONObject(param);	
+			Iterator<?> keys = ogData.keys();
+			while( keys.hasNext() ){
+				String key = (String)keys.next();
+				Object o = ogData.get(key);
+				if(key.equals("message")){
+					shareText = (String) o;
+					continue;
+				}
+				if(key.equals("url")){
+					shareURL = (String) o;
+					continue;
+				}
+			}
 		} catch(JSONException e) {
 			logger.log("{utils-native} Error in Params of shareText because "+ e.getMessage());
 		}
@@ -161,5 +161,4 @@ public class UtilsPlugin implements IPlugin {
 		sendIntent.setType("text/plain");
 		_activity.startActivity(Intent.createChooser(sendIntent, "Spread the word"));
 	}
-
 }
