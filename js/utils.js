@@ -51,7 +51,7 @@ var Utils = Class(function () {
 			invokeCallbacks(jbCB, true, evt.jb);
 		});
 	}
-	
+
 	this.shareText = function(message, url) {
 		logger.log("{utils} Sharing Love");
 
@@ -60,12 +60,12 @@ var Utils = Class(function () {
 		pluginSend("shareText", parameters);
 	}
 
-	this.getDevice = function(next) {
+	this.getDeviceInfo = function(next) {
 		logger.log("{utils} Getting Device Details");
 
 		infoCB.push(next);
 
-		pluginSend("getDevice");
+		pluginSend("getDeviceInfo");
 	}
 
 	this.logIt = function(stringData){

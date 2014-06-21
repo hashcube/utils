@@ -16,6 +16,7 @@ import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 
 import java.util.Iterator;
+import java.util.Locale;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -30,6 +31,7 @@ public class UtilsPlugin implements IPlugin {
 		String device;
 		String versionNumber;
 		String store;
+		String language;
 
 		public DeviceEvent(Context context) {
 			super("deviceInfo");
@@ -48,10 +50,12 @@ public class UtilsPlugin implements IPlugin {
 			this.os = android.os.Build.VERSION.RELEASE;
 			this.device = android.os.Build.MODEL;
 			this.versionNumber = myVersionName;
+			this.language = Locale.getDefault().getLanguage();
+
 			try{
 				Bundle meta = packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA).metaData;
 				if (meta != null) {
-					this.store = meta.get("INSTALL_STORE").toString();					
+					this.store = meta.get("INSTALL_STORE").toString();
 				}
 			} catch (Exception e) {
 				logger.log("{utils-native} Exception on start:", e.getMessage());
@@ -111,7 +115,7 @@ public class UtilsPlugin implements IPlugin {
 		logger.log("{utils-native} logError "+ errorDesc);
 	}
 
-	public void getDevice(String dummy) {
+	public void getDeviceInfo(String dummy) {
 		EventQueue.pushEvent(new DeviceEvent(_context));
 	}
 
@@ -138,7 +142,7 @@ public class UtilsPlugin implements IPlugin {
 		logger.log("{utils-native} Inside shareText");
 		String shareText = "", shareURL = "";
 		try {
-			JSONObject ogData = new JSONObject(param);	
+			JSONObject ogData = new JSONObject(param);
 			Iterator<?> keys = ogData.keys();
 			while( keys.hasNext() ){
 				String key = (String)keys.next();

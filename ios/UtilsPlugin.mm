@@ -17,7 +17,7 @@
 	return self;
 }
 
-- (void)getDevice:(NSDictionary *)jsonObject {
+- (void)getDeviceInfo:(NSDictionary *)jsonObject {
 	NSString *m_platform = 0;
 	size_t size;
 	sysctlbyname("hw.machine", NULL, &size, NULL, 0);
@@ -26,12 +26,14 @@
 	machine[size] = '\0';
 	m_platform = [NSString stringWithUTF8String:machine];
 	free(machine);
+	NSString *language = [[NSLocale preferredLanguages] objectAtIndex:0];
 
 	[[PluginManager get] dispatchJSEvent:[NSDictionary dictionaryWithObjectsAndKeys:
 		@"deviceInfo",@"name",
 		m_platform,@"device",
 		@"ios",@"type",
 		@"ios",@"store",
+		language,@"language",
 		[[UIDevice currentDevice] systemVersion],@"os",
 		[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"],@"versionNumber",
 		nil]];
@@ -81,23 +83,23 @@
  * http://resources.infosecinstitute.com/ios-application-security-part-23-jailbreak-detection-evasion/
  */
 - (void)isJailBroken:(NSDictionary *)jsonObject {
-    
+
     //By default device is not jailbroken
 	BOOL jailBroken = NO;
 #if !(TARGET_IPHONE_SIMULATOR)
-	if ([[NSFileManager defaultManager] 
+	if ([[NSFileManager defaultManager]
 			fileExistsAtPath:@"/Applications/Cydia.app"]) {
 		jailBroken = YES;
-	} else if([[NSFileManager defaultManager] 
+	} else if([[NSFileManager defaultManager]
 			fileExistsAtPath:@"/Library/MobileSubstrate/MobileSubstrate.dylib"]) {
 		jailBroken = YES;
-	} else if([[NSFileManager defaultManager] 
+	} else if([[NSFileManager defaultManager]
 			fileExistsAtPath:@"/bin/bash"]) {
 		jailBroken = YES;
-	} else if([[NSFileManager defaultManager] 
+	} else if([[NSFileManager defaultManager]
 			fileExistsAtPath:@"/usr/sbin/sshd"]) {
 		jailBroken = YES;
-	} else if([[NSFileManager defaultManager] 
+	} else if([[NSFileManager defaultManager]
 			fileExistsAtPath:@"/etc/apt"]) {
 		jailBroken = YES;
 	}
@@ -113,7 +115,7 @@
 		[[NSFileManager defaultManager] removeItemAtPath:@"/private/jailbreak.txt" error:nil];
 	}
 
-	if([[UIApplication sharedApplication] 
+	if([[UIApplication sharedApplication]
 			canOpenURL:[NSURL URLWithString:@"cydia://package/com.example.package"]]) {
 		//Device is jailbroken
 		jailBroken = YES;
