@@ -1,5 +1,6 @@
 #import "UtilsPlugin.h"
 #import <sys/sysctl.h>
+#import <AdSupport/ASIdentifierManager.h>
 
 @implementation UtilsPlugin
 
@@ -84,7 +85,7 @@
  */
 - (void)isJailBroken:(NSDictionary *)jsonObject {
 
-    //By default device is not jailbroken
+	//By default device is not jailbroken
 	BOOL jailBroken = NO;
 #if !(TARGET_IPHONE_SIMULATOR)
 	if ([[NSFileManager defaultManager]
@@ -122,11 +123,25 @@
 	}
 #endif
 
-    NSString *ret = (jailBroken)? @"true": @"false";
+	NSString *ret = (jailBroken)? @"true": @"false";
 	[[PluginManager get] dispatchJSEvent:[NSDictionary dictionaryWithObjectsAndKeys:
-        @"utilsJailBroken",@"name",
+		@"utilsJailBroken",@"name",
 		ret,@"jb",
 		nil]];
 }
 
+- (void)getAdvertisingId:(NSDictionary *)jsonObject {
+	NSString *limit_tracking = @"1";
+	NSString *id = [[ASIdentifierManager sharedManager].advertisingIdentifier UUIDString];
+
+	if([[ASIdentifierManager sharedManager] isAdvertisingTrackingEnabled]) {
+		limit_tracking = @"0";
+	}
+	[[PluginManager get] dispatchJSEvent:[NSDictionary dictionaryWithObjectsAndKeys:
+		@"utilsAdvertisingId",@"name",
+		id,@"id",
+		limit_tracking, @"limit_tracking",
+		nil]];
+
+}
 @end

@@ -5,6 +5,7 @@ import com.tealeaf.TeaLeaf;
 import com.tealeaf.EventQueue;
 import com.tealeaf.plugin.IPlugin;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Build.*;
 import android.os.Build.VERSION.*;
@@ -14,6 +15,8 @@ import android.content.Context;
 import android.net.Uri;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+import com.google.android.gms.ads.identifier.AdvertisingIdClient;
+import com.google.android.gms.ads.identifier.AdvertisingIdClient.Info;
 
 import java.util.Iterator;
 import java.util.Locale;
@@ -39,9 +42,9 @@ public class UtilsPlugin implements IPlugin {
 			String packageName = context.getPackageName();
 			String myVersionName = "not available";
 			try {
-			    myVersionName = packageManager.getPackageInfo(packageName, 0).versionName;
+				myVersionName = packageManager.getPackageInfo(packageName, 0).versionName;
 			} catch (PackageManager.NameNotFoundException e) {
-			    e.printStackTrace();
+				e.printStackTrace();
 			}
 			this.type = "android";
 			if (android.os.Build.BRAND.equalsIgnoreCase("Amazon")) {
@@ -65,6 +68,18 @@ public class UtilsPlugin implements IPlugin {
 				this.device = "NokiaX";
 				this.type = "nokia";
 			}
+		}
+	}
+
+	public class AdvertisingIdEvent extends com.tealeaf.event.Event {
+		String id;
+		int limit_tracking;
+
+		public AdvertisingIdEvent(String id, boolean limit) {
+			super("utilsAdvertisingId");
+
+			this.id = id;
+			this.limit_tracking = limit? 1: 0;
 		}
 	}
 
@@ -164,5 +179,25 @@ public class UtilsPlugin implements IPlugin {
 		sendIntent.putExtra(Intent.EXTRA_TEXT, shareText + " : (" + shareURL + ") #sudoku #sudokuquest");
 		sendIntent.setType("text/plain");
 		_activity.startActivity(Intent.createChooser(sendIntent, "Spread the word"));
+	}
+
+	public void getAdvertisingId(String dummy) {
+
+		AsyncTask<Void, Void, String> task = new AsyncTask<Void, Void, String>() {
+			@Override
+				protected String doInBackground(Void... params) {
+					try {
+						final Info adInfo = AdvertisingIdClient.getAdvertisingIdInfo(_context);
+						final boolean isLAT = adInfo.isLimitAdTrackingEnabled();
+						final String adId = adInfo.getId();
+						EventQueue.pushEvent(new AdvertisingIdEvent(adId, isLAT));
+					} catch (Exception e) {
+						//either google play services not available/old client
+					}
+					//dummy return
+					return "";
+				}
+		};
+		task.execute();
 	}
 }
