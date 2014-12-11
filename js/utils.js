@@ -1,23 +1,22 @@
 function pluginSend(evt, params) {
-	NATIVE && NATIVE.plugins && NATIVE.plugins.sendEvent &&
-		NATIVE.plugins.sendEvent("UtilsPlugin", evt,
-				JSON.stringify(params || {}));
+	NATIVE.plugins.sendEvent("UtilsPlugin", evt,
+			JSON.stringify(params || {}));
 }
 
 function pluginOn(evt, next) {
-	NATIVE && NATIVE.events && NATIVE.events.registerHandler &&
-		NATIVE.events.registerHandler(evt, next);
+	NATIVE.events.registerHandler(evt, next);
 }
 
 function invokeCallbacks(list, clear) {
 	// Pop off the first two arguments and keep the rest
-	var args = Array.prototype.slice.call(arguments);
-	args.shift();
-	args.shift();
+	var args = Array.prototype.splice.call(arguments, 2),
+	    i = 0,
+	    len = list.length,
+	    next;
 
 	// For each callback,
-	for (var ii = 0; ii < list.length; ++ii) {
-		var next = list[ii];
+	for (i = 0; i < len; ++i) {
+		next = list[i];
 
 		// If callback was actually specified,
 		if (next) {
@@ -32,9 +31,10 @@ function invokeCallbacks(list, clear) {
 	}
 }
 
-var Utils = Class(function () {
+exports = new (Class(function () {
 	var infoCB = [],
-	    jbCB = [];
+	    jbCB = [],
+	    adIdCB = [];
 
 	this.init = function(opts) {
 		logger.log("{utils} Registering for events on startup");
@@ -49,6 +49,10 @@ var Utils = Class(function () {
 			logger.log("{utils} isJailBroken:", JSON.stringify(evt));
 
 			invokeCallbacks(jbCB, true, evt.jb);
+		});
+
+		pluginOn("utilsAdvertisingId", function(evt) {
+			invokeCallbacks(adIdCB, true, evt.id, evt.limit_tracking);
 		});
 	}
 
@@ -68,7 +72,7 @@ var Utils = Class(function () {
 		pluginSend("getDeviceInfo");
 	}
 
-	this.logIt = function(stringData){
+	this.logIt = function(stringData) {
 		logger.log("{utils} LogIT: "+ stringData+" |||");
 
 		pluginSend("logIt",{"message":stringData});
@@ -82,6 +86,9 @@ var Utils = Class(function () {
 		pluginSend("isJailBroken");
 	}
 
-});
+	this.getAdvertisingId = function(next) {
+		adIdCB.push(next);
+		pluginSend("getAdvertisingId");
+	}
 
-exports = new Utils();
+}))();
