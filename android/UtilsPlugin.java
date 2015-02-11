@@ -186,14 +186,17 @@ public class UtilsPlugin implements IPlugin {
 		AsyncTask<Void, Void, String> task = new AsyncTask<Void, Void, String>() {
 			@Override
 				protected String doInBackground(Void... params) {
+					String advertiseId = "";
+					boolean limitedTrackEnabled = false;
 					try {
 						final Info adInfo = AdvertisingIdClient.getAdvertisingIdInfo(_context);
-						final boolean isLAT = adInfo.isLimitAdTrackingEnabled();
-						final String adId = adInfo.getId();
-						EventQueue.pushEvent(new AdvertisingIdEvent(adId, isLAT));
+						limitedTrackEnabled = adInfo.isLimitAdTrackingEnabled();
+						advertiseId = adInfo.getId();
 					} catch (Exception e) {
 						//either google play services not available/old client
+						logger.log("{utils-native} Error trying to retrieve advertising details" + e.getMessage());
 					}
+					EventQueue.pushEvent(new AdvertisingIdEvent(advertiseId, limitedTrackEnabled));
 					//dummy return
 					return "";
 				}
