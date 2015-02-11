@@ -187,7 +187,7 @@ public class UtilsPlugin implements IPlugin {
 			@Override
 				protected String doInBackground(Void... params) {
 					String advertiseId = "";
-					boolean limitAdTrackEnabled = false;
+					boolean limitAdTrackEnabled = true;
 					try {
 						final Info adInfo = AdvertisingIdClient.getAdvertisingIdInfo(_context);
 						limitAdTrackEnabled = adInfo.isLimitAdTrackingEnabled();
