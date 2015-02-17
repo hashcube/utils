@@ -111,8 +111,8 @@ exports = new (Class(function () {
     log('Getting advertising ID');
 
     if (!device.isMobileNative) {
-      // return a random number between 0 and 1000
-      next(Math.floor(Math.random() * 1000));
+      // return a random number between 0 and 1000 and doNotTrack info
+      next(Math.floor(Math.random() * 1000), navigator.doNotTrack);
     } else {
       cb_advt.push(next);
       pluginSend('getAdvertisingId');
