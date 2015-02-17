@@ -1,11 +1,16 @@
-/* global NATIVE, logger */
+/* global NATIVE, logger, device, navigator, CONFIG */
+
+/* jshint ignore: start */
+import device;
+/* jshint ignore: end */
 
 exports = new (Class(function () {
   'use strict';
 
-  var infoCB = [],
-    jbCB = [],
-    adIdCB = [],
+  var debug = false,
+    cb_info = [],
+    cb_jailbreak = [],
+    cb_advt = [],
     pluginSend = function (evt, params) {
       NATIVE.plugins.sendEvent('UtilsPlugin', evt,
           JSON.stringify(params || {}));
@@ -13,16 +18,23 @@ exports = new (Class(function () {
     pluginOn = function (evt, next) {
       NATIVE.events.registerHandler(evt, next);
     },
-    invokeCallbacks = function (list, clear) {
+    log = function () {
+      var msg = '{utils} ';
+
+      if (debug) {
+        msg += Array.prototype.join.call(arguments, ' ');
+        logger.log.apply(null, msg);
+      }
+    },
+    invokeCallbacks = function (list) {
       // Pop off the first two arguments and keep the rest
       var args = Array.prototype.splice.call(arguments, 2),
-          i = 0,
-          len = list.length,
-          next;
+        len = list.length,
+        i, next;
 
       // For each callback,
       for (i = 0; i < len; ++i) {
-        next = list[i];
+        next = list.pop();
 
         // If callback was actually specified,
         if (next) {
@@ -30,65 +42,80 @@ exports = new (Class(function () {
           next.apply(null, args);
         }
       }
-
-      // If asked to clear the list too,
-      if (clear) {
-        list.length = 0;
-      }
+      list.length = 0;
     };
 
   this.init = function () {
-    logger.log('{utils} Registering for events on startup');
+    logger.log('Register for events');
 
     pluginOn('deviceInfo', function (evt) {
-      logger.log('{utils} Device Info Received:', JSON.stringify(evt));
+      log('Device info received:', JSON.stringify(evt));
 
-      invokeCallbacks(infoCB, true, evt);
+      invokeCallbacks(cb_info, true, evt);
     });
 
     pluginOn('utilsJailBroken', function (evt) {
-      logger.log('{utils} isJailBroken:', JSON.stringify(evt));
+      log('isJailBroken:', JSON.stringify(evt));
 
-      invokeCallbacks(jbCB, true, evt.jb);
+      invokeCallbacks(cb_jailbreak, true, evt.jb);
     });
 
     pluginOn('utilsAdvertisingId', function (evt) {
-      invokeCallbacks(adIdCB, true, evt.id, evt.limit_tracking);
+      log('Advertising ID received:', JSON.stringify(evt));
+
+      invokeCallbacks(cb_advt, true, evt.id, evt.limit_tracking);
     });
   };
 
   this.shareText = function (message, url) {
     var parameters = {'message': message, 'url': url};
 
-    logger.log('{utils} Sharing Text');
+    log('Sharing text');
 
     pluginSend('shareText', parameters);
   };
 
   this.getDeviceInfo = function (next) {
-    logger.log('{utils} Getting Device Details');
+    log('Getting device details');
 
-    infoCB.push(next);
-
-    pluginSend('getDeviceInfo');
+    if (!device.isMobileNative) {
+      next({
+        type: 'browser',
+        language: navigator.language,
+        os: navigator.platform,
+        device: navigator.userAgent,
+        versionNumber: CONFIG.version,
+        store: 'web'
+      });
+    } else {
+      cb_info.push(next);
+      pluginSend('getDeviceInfo');
+    }
   };
 
   this.logIt = function (stringData) {
-    logger.log('{utils} LogIT: ' + stringData);
+    log('Log it: ' + stringData);
 
     pluginSend('logIt', {'message': stringData});
   };
 
   this.isJailBroken = function (next) {
-    logger.log('{utils} isJailBroken check');
+    log('isJailBroken check');
 
-    jbCB.push(next);
+    cb_jailbreak.push(next);
 
     pluginSend('isJailBroken');
   };
 
   this.getAdvertisingId = function (next) {
-    adIdCB.push(next);
-    pluginSend('getAdvertisingId');
+    log('Getting advertising ID');
+
+    if (!device.isMobileNative) {
+      // return a random number between 0 and 1000
+      next(Math.floor(Math.random() * 1000));
+    } else {
+      cb_advt.push(next);
+      pluginSend('getAdvertisingId');
+    }
   };
 }))();
