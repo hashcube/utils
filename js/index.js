@@ -19,11 +19,8 @@ exports = new (Class(function () {
       NATIVE.events.registerHandler(evt, next);
     },
     log = function () {
-      var msg = '{utils} ';
-
       if (debug) {
-        msg += Array.prototype.join.call(arguments, ' ');
-        logger.log.apply(null, msg);
+        logger.log.apply(null, '{utils}', arguments);
       }
     },
     invokeCallbacks = function (list) {
