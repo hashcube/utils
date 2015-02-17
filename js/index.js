@@ -23,7 +23,7 @@ exports = new (Class(function () {
 
       if (debug) {
         msg += Array.prototype.join.call(arguments, ' ');
-        logger.log.apply(null, msg);
+        logger.log(msg);
       }
     },
     invokeCallbacks = function (list) {
