@@ -77,6 +77,10 @@
 	UIActivityViewController *activityController = [[UIActivityViewController alloc] initWithActivityItems:sharingItems applicationActivities:nil];
 	UIWindow *window = [[UIApplication sharedApplication] keyWindow];
 	UIViewController *topView = window.rootViewController;
+	if ([activityController respondsToSelector:@selector(popoverPresentationController)] ) {
+		// iOS8
+		activityController.popoverPresentationController.sourceView = topView.view;
+	}
 	[topView presentViewController:activityController animated:YES completion:nil];
 }
 
