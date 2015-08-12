@@ -87,6 +87,10 @@
 		UIActivityTypeAddToReadingList,
 		UIActivityTypePostToWeibo]];
 
+	if ([activityController respondsToSelector:@selector(popoverPresentationController)] ) {
+		// iOS8
+		activityController.popoverPresentationController.sourceView = topView.view;
+	}
 	[topView presentViewController:activityController animated:YES completion:nil];
 	// adding callback, to check where the content is shared
 	[activityController setCompletionHandler:^(NSString *act, BOOL done)
