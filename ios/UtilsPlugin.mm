@@ -100,13 +100,12 @@
 		if ( [act isEqualToString:UIActivityTypePostToTwitter])		sharedApp = @"Twitter";
 		if ( [act isEqualToString:UIActivityTypePostToFacebook])	sharedApp = @"Facebook";
 		if ( [act isEqualToString:UIActivityTypeMessage])			sharedApp = @"SMS";
-		if ( done )
-		{
-			[[PluginManager get] dispatchJSEvent:[NSDictionary dictionaryWithObjectsAndKeys:
-			@"sharedWithApp",@"name",
-			sharedApp,@"sharedApp",
-			nil]];
-		}
+		if ( ~done)                                                 sharedApp = @"cancelled";
+        
+        [[PluginManager get] dispatchJSEvent:[NSDictionary dictionaryWithObjectsAndKeys:
+                                              @"sharedWithApp",@"name",
+                                              sharedApp,@"sharedApp",
+                                              nil]];
 	}];
 }
 
