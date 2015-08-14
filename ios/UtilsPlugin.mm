@@ -44,8 +44,6 @@
 		[[UIDevice currentDevice] systemVersion],@"os",
 		[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"],@"versionNumber",
 		nil]];
-
-	NSLog(@"Install date %@", installDate);
 }
 
 - (void)logIt: (NSDictionary *)jsonObject{
