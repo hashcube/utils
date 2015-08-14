@@ -31,19 +31,21 @@
 	NSURL* urlToDocumentsFolder = [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory
 									inDomains:NSUserDomainMask] lastObject];
 	__autoreleasing NSError *error;
-	NSTimeInterval installDate = [[[[NSFileManager defaultManager] attributesOfItemAtPath:urlToDocumentsFolder.path
-										error:&error] objectForKey:NSFileCreationDate] timeIntervalSince1970];
+	NSDate *installDate = [[[NSFileManager defaultManager] attributesOfItemAtPath:urlToDocumentsFolder.path
+										error:&error] objectForKey:NSFileCreationDate];
 
 	[[PluginManager get] dispatchJSEvent:[NSDictionary dictionaryWithObjectsAndKeys:
 		@"deviceInfo",@"name",
 		m_platform,@"device",
 		@"ios",@"type",
-		installDate,@"installDate",
+		[NSNumber numberWithDouble:[installDate timeIntervalSince1970]],@"installDate",
 		@"ios",@"store",
 		language,@"language",
 		[[UIDevice currentDevice] systemVersion],@"os",
 		[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"],@"versionNumber",
 		nil]];
+
+	NSLog(@"Install date %@", installDate);
 }
 
 - (void)logIt: (NSDictionary *)jsonObject{
