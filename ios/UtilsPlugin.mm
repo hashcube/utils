@@ -28,11 +28,17 @@
 	m_platform = [NSString stringWithUTF8String:machine];
 	free(machine);
 	NSString *language = [[NSLocale preferredLanguages] objectAtIndex:0];
+	NSURL* urlToDocumentsFolder = [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory
+																		  inDomains:NSUserDomainMask] lastObject];
+	__autoreleasing NSError *error;
+	NSDate *installDate = [[[NSFileManager defaultManager] attributesOfItemAtPath:urlToDocumentsFolder.path
+																			error:&error] objectForKey:NSFileCreationDate];
 
 	[[PluginManager get] dispatchJSEvent:[NSDictionary dictionaryWithObjectsAndKeys:
 		@"deviceInfo",@"name",
 		m_platform,@"device",
 		@"ios",@"type",
+		installDate,@"installDate",
 		@"ios",@"store",
 		language,@"language",
 		[[UIDevice currentDevice] systemVersion],@"os",
