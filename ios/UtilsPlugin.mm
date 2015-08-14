@@ -29,10 +29,10 @@
 	free(machine);
 	NSString *language = [[NSLocale preferredLanguages] objectAtIndex:0];
 	NSURL* urlToDocumentsFolder = [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory
-																		  inDomains:NSUserDomainMask] lastObject];
+									inDomains:NSUserDomainMask] lastObject];
 	__autoreleasing NSError *error;
 	NSDate *installDate = [[[NSFileManager defaultManager] attributesOfItemAtPath:urlToDocumentsFolder.path
-																			error:&error] objectForKey:NSFileCreationDate];
+										error:&error] objectForKey:NSFileCreationDate];
 
 	[[PluginManager get] dispatchJSEvent:[NSDictionary dictionaryWithObjectsAndKeys:
 		@"deviceInfo",@"name",
