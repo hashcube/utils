@@ -31,8 +31,8 @@
 	NSURL* urlToDocumentsFolder = [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory
 									inDomains:NSUserDomainMask] lastObject];
 	__autoreleasing NSError *error;
-	NSDate *installDate = [[[NSFileManager defaultManager] attributesOfItemAtPath:urlToDocumentsFolder.path
-										error:&error] objectForKey:NSFileCreationDate];
+	NSTimeInterval installDate = [[[[NSFileManager defaultManager] attributesOfItemAtPath:urlToDocumentsFolder.path
+										error:&error] objectForKey:NSFileCreationDate] timeIntervalSince1970];
 
 	[[PluginManager get] dispatchJSEvent:[NSDictionary dictionaryWithObjectsAndKeys:
 		@"deviceInfo",@"name",
