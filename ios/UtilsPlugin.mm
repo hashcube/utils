@@ -80,10 +80,39 @@
 	NSMutableArray *sharingItems = [NSMutableArray new];
 	[sharingItems addObject:shareText];
 	[sharingItems addObject:shareURL];
-	UIActivityViewController *activityController = [[UIActivityViewController alloc] initWithActivityItems:sharingItems applicationActivities:nil];
+
 	UIWindow *window = [[UIApplication sharedApplication] keyWindow];
 	UIViewController *topView = window.rootViewController;
+	UIActivityViewController *activityController = [[UIActivityViewController alloc] initWithActivityItems:sharingItems applicationActivities:nil];
+
+	[activityController setExcludedActivityTypes:
+		@[UIActivityTypeAssignToContact,
+		UIActivityTypeCopyToPasteboard,
+		UIActivityTypePrint,
+		UIActivityTypeSaveToCameraRoll,
+		UIActivityTypeAddToReadingList,
+		UIActivityTypePostToWeibo]];
+
+	if ([activityController respondsToSelector:@selector(popoverPresentationController)] ) {
+		// iOS8
+		activityController.popoverPresentationController.sourceView = topView.view;
+	}
 	[topView presentViewController:activityController animated:YES completion:nil];
+	// adding callback, to check where the content is shared
+	[activityController setCompletionHandler:^(NSString *act, BOOL done)
+	{
+		NSString *sharedApp = nil;
+		if ( [act isEqualToString:UIActivityTypeMail])				sharedApp = @"Mail";
+		if ( [act isEqualToString:UIActivityTypePostToTwitter])		sharedApp = @"Twitter";
+		if ( [act isEqualToString:UIActivityTypePostToFacebook])	sharedApp = @"Facebook";
+		if ( [act isEqualToString:UIActivityTypeMessage])			sharedApp = @"SMS";
+		if ( ~done)                                                 sharedApp = @"cancelled";
+        
+        [[PluginManager get] dispatchJSEvent:[NSDictionary dictionaryWithObjectsAndKeys:
+                                              @"sharedWithApp",@"name",
+                                              sharedApp,@"sharedApp",
+                                              nil]];
+	}];
 }
 
 /* Code adapted from
