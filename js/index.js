@@ -11,6 +11,7 @@ exports = new (Class(function () {
     cb_info = [],
     cb_jailbreak = [],
     cb_advt = [],
+    cb_shared_app = [],
     pluginSend = function (evt, params) {
       NATIVE.plugins.sendEvent('UtilsPlugin', evt,
           JSON.stringify(params || {}));
@@ -65,12 +66,19 @@ exports = new (Class(function () {
 
       invokeCallbacks(cb_advt, true, evt.id, evt.limit_tracking);
     });
+
+    pluginOn('sharedWithApp', function (evt) {
+      log('sharedWithApp:', JSON.stringify(evt));
+
+      invokeCallbacks(cb_shared_app, true, evt.sharedApp);
+    });
   };
 
-  this.shareText = function (message, url) {
+  this.shareText = function (message, url, callback) {
     var parameters = {'message': message, 'url': url};
 
     log('Sharing text');
+    cb_shared_app.push(callback)
 
     pluginSend('shareText', parameters);
   };

@@ -202,7 +202,7 @@ public class UtilsPlugin implements IPlugin {
 					try {
 						final Info adInfo = AdvertisingIdClient.getAdvertisingIdInfo(_context);
 						isLAT = adInfo.isLimitAdTrackingEnabled();
-						String adId = adInfo.getId();
+						adId = adInfo.getId();
 						EventQueue.pushEvent(new AdvertisingIdEvent(adId, isLAT));
 					} catch (Exception e) {
 						//either google play services not available/old client
