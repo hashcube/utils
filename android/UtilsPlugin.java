@@ -50,7 +50,7 @@ public class UtilsPlugin implements IPlugin {
 				PackageInfo packageInfo = packageManager.getPackageInfo(packageName, 0);
 				myVersionName = packageInfo.versionName;
 				//dividing by thousand to convert milliseconds to seconds
-				firstInstallTime = packageInfo.firstInstallTime/1000;
+				firstInstallTime = packageInfo.firstInstallTime;
 			} catch (PackageManager.NameNotFoundException e) {
 				e.printStackTrace();
 			}
