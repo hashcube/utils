@@ -38,7 +38,7 @@
 		@"deviceInfo",@"name",
 		m_platform,@"device",
 		@"ios",@"type",
-		[NSNumber numberWithDouble:[installDate timeIntervalSince1970]],@"installDate",
+		[NSNumber numberWithDouble:[[installDate timeIntervalSince1970] * 1000]],@"installDate",
 		@"ios",@"store",
 		language,@"language",
 		[[UIDevice currentDevice] systemVersion],@"os",
