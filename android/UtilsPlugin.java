@@ -198,7 +198,7 @@ public class UtilsPlugin implements IPlugin {
 					String adId = "";
 					boolean isLAT = true;
 
-					adId = android.os.Build.SERIAL;cd
+					adId = android.os.Build.SERIAL;
 					try {
 						final Info adInfo = AdvertisingIdClient.getAdvertisingIdInfo(_context);
 						isLAT = adInfo.isLimitAdTrackingEnabled();
