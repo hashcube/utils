@@ -198,16 +198,16 @@ public class UtilsPlugin implements IPlugin {
 					String adId = "";
 					boolean isLAT = true;
 
-					adId = android.os.Build.SERIAL;
+					adId = android.os.Build.SERIAL;cd
 					try {
 						final Info adInfo = AdvertisingIdClient.getAdvertisingIdInfo(_context);
 						isLAT = adInfo.isLimitAdTrackingEnabled();
 						adId = adInfo.getId();
-						EventQueue.pushEvent(new AdvertisingIdEvent(adId, isLAT));
 					} catch (Exception e) {
 						//either google play services not available/old client
 						logger.log("{utils-native} Error trying to retrieve advertising details" + e.getMessage());
 					}
+					EventQueue.pushEvent(new AdvertisingIdEvent(adId, isLAT));
 					//dummy return
 					return "";
 				}
