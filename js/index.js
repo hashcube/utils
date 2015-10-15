@@ -12,7 +12,7 @@ exports = new (Class(function () {
     cb_jailbreak = [],
     cb_advt = [],
     cb_shared_app = [],
-    retryForAdId = 0,
+    retry_adv = 0,
     pluginSend = function (evt, params) {
       NATIVE.plugins.sendEvent('UtilsPlugin', evt,
           JSON.stringify(params || {}));
@@ -68,7 +68,7 @@ exports = new (Class(function () {
     pluginOn('utilsAdvertisingId', function (evt) {
       log('Advertising ID received:', JSON.stringify(evt));
 
-      if (!evt.id && ++retryForAdId < 3) {
+      if (!evt.id && ++retry_adv < 3) {
         sendRequestAdvId();
         return;
       }
@@ -125,7 +125,7 @@ exports = new (Class(function () {
 
   this.getAdvertisingId = function (next) {
     log('Getting advertising ID');
-    retryForAdId = 0;
+    retry_adv = 0;
 
     if (!device.isMobileNative) {
       // return a random number between 0 and 1000 and doNotTrack info
