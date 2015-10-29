@@ -7,8 +7,6 @@ import com.tealeaf.plugin.IPlugin;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Build.*;
-import android.os.Build.VERSION.*;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.Context;
@@ -198,8 +196,10 @@ public class UtilsPlugin implements IPlugin {
 					String adId = "";
 					boolean isLAT = true;
 
-					adId = android.os.Build.SERIAL;
 					try {
+						if(android.os.Build.MANUFACTURER.equals("Amazon")) {
+							adId = android.os.Build.SERIAL;
+						}
 						final Info adInfo = AdvertisingIdClient.getAdvertisingIdInfo(_context);
 						isLAT = adInfo.isLimitAdTrackingEnabled();
 						adId = adInfo.getId();
