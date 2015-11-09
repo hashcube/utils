@@ -8,5 +8,8 @@
 	"userDefined": [
 	],
 	"plist": {
+		"NSAppTransportSecurity": {
+			"NSAllowArbitraryLoads": true
+		}
 	}
 }
