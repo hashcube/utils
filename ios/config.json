@@ -3,8 +3,7 @@
 		"UtilsPlugin.h",
 		"UtilsPlugin.mm"
 	],
-	"disableBitcode": [
-	],
+	"disableBitcode": true,
 	"frameworks": [
 	],
 	"userDefined": [
