@@ -12,7 +12,6 @@ exports = new (Class(function () {
     cb_jailbreak = [],
     cb_advt = [],
     cb_shared_app = [],
-    retry_adv = 0,
     pluginSend = function (evt, params) {
       NATIVE.plugins.sendEvent('UtilsPlugin', evt,
           JSON.stringify(params || {}));
@@ -45,9 +44,6 @@ exports = new (Class(function () {
         }
       }
       list.length = 0;
-    },
-    sendRequestAdvId = function () {
-      pluginSend('getAdvertisingId');
     };
 
   this.init = function () {
@@ -68,10 +64,6 @@ exports = new (Class(function () {
     pluginOn('utilsAdvertisingId', function (evt) {
       log('Advertising ID received:', JSON.stringify(evt));
 
-      if (!evt.id && ++retry_adv < 3) {
-        sendRequestAdvId();
-        return;
-      }
       invokeCallbacks(cb_advt, true, evt.id, evt.limit_tracking);
     });
 
@@ -125,14 +117,13 @@ exports = new (Class(function () {
 
   this.getAdvertisingId = function (next) {
     log('Getting advertising ID');
-    retry_adv = 0;
 
     if (!device.isMobileNative) {
       // return a random number between 0 and 1000 and doNotTrack info
       next(Math.floor(Math.random() * 1000), navigator.doNotTrack);
     } else {
       cb_advt.push(next);
-      sendRequestAdvId();
+      pluginSend('getAdvertisingId');
     }
   };
 }))();

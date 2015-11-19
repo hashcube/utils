@@ -190,28 +190,24 @@ public class UtilsPlugin implements IPlugin {
 
 	public void getAdvertisingId(String dummy) {
 
-		AsyncTask<Void, Void, String> task = new AsyncTask<Void, Void, String>() {
-			@Override
-				protected String doInBackground(Void... params) {
-					String adId = "";
-					boolean isLAT = true;
+		new Thread(new Runnable() {
+			public void run() {
+				String adId = "";
+				boolean isLAT = true;
 
-					try {
-						if(android.os.Build.MANUFACTURER.equals("Amazon")) {
-							adId = android.os.Build.SERIAL;
-						}
-						final Info adInfo = AdvertisingIdClient.getAdvertisingIdInfo(_context);
-						isLAT = adInfo.isLimitAdTrackingEnabled();
-						adId = adInfo.getId();
-					} catch (Exception e) {
-						//either google play services not available/old client
-						logger.log("{utils-native} Error trying to retrieve advertising details" + e.getMessage());
+				try {
+					if(android.os.Build.MANUFACTURER.equals("Amazon")) {
+						adId = android.os.Build.SERIAL;
 					}
-					EventQueue.pushEvent(new AdvertisingIdEvent(adId, isLAT));
-					//dummy return
-					return "";
+					final Info adInfo = AdvertisingIdClient.getAdvertisingIdInfo(_context);
+					isLAT = adInfo.isLimitAdTrackingEnabled();
+					adId = adInfo.getId();
+				} catch (Exception e) {
+					//either google play services not available/old client
+					logger.log("{utils-native} Error trying to retrieve advertising details" + e.getMessage());
 				}
-		};
-		task.execute();
+				EventQueue.pushEvent(new AdvertisingIdEvent(adId, isLAT));
+			}
+		}).start();
 	}
 }
