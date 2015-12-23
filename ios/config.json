@@ -3,7 +3,10 @@
 		"UtilsPlugin.h",
 		"UtilsPlugin.mm"
 	],
-	"disableBitcode": true,
+	"userBuildSettings": {
+		"ENABLE_BITCODE": false,
+		"COPY_PHASE_STRIP": false
+	},
 	"frameworks": [
 	],
 	"userDefined": [
