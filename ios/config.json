@@ -13,7 +13,7 @@
 	],
 	"plist": {
 		"NSAppTransportSecurity": {
-			"NSAllowArbitraryLoads": true
+			"NSAllowsArbitraryLoads": true
 		}
 	}
 }
