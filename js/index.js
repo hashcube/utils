@@ -72,6 +72,11 @@ exports = new (Class(function () {
 
       invokeCallbacks(cb_shared_app, true, evt.sharedApp);
     });
+
+    pluginOn('performActionForShortcutItem', function (evt) {
+      log("Error in 3DTouch. This should not be executed");
+    });
+
   };
 
   this.shareText = function (message, url, callback) {
@@ -126,4 +131,11 @@ exports = new (Class(function () {
       pluginSend('getAdvertisingId');
     }
   };
+
+  this.updateShortcutItems = function (jsonObject) {
+    log('Updating shortcut Items');
+
+    pluginSend('updateShortcutItems', jsonObject);
+  };
+
 }))();

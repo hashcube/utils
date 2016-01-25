@@ -18,6 +18,34 @@
 	return self;
 }
 
+// Called from native-ios for 3D touch action
+- (void) performActionForShortcutItem:(NSString*) shortcutItem {
+    //Attempt to send to Application.js
+    @try {
+        [[PluginManager get] dispatchJSEvent:[NSDictionary dictionaryWithObjectsAndKeys:
+            @"performActionForShortcutItem", @"name",
+            shortcutItem, @"val",
+            nil]];
+    }
+    @catch (NSException *exception) {
+        NSLog(@"{3DTouch} Failure to get: %@", exception);
+    }
+}
+
+- (void) updateShortcutItems: (NSDictionary *)jsonObject {
+    NSMutableArray *shortcutItem = [[NSMutableArray alloc] init];
+
+    for (id key in jsonObject) {
+        NSDictionary *dict = [jsonObject objectForKey:key];
+        UIApplicationShortcutItem *item = [[UIApplicationShortcutItem alloc]initWithType:key localizedTitle: [dict objectForKey:@"title"] localizedSubtitle: nil icon: nil userInfo: nil];
+        // Push item to array
+        [shortcutItem addObject:item];
+     }
+    [UIApplication sharedApplication].shortcutItems = shortcutItem;
+    NSLog(@"{3DTouch} => List Updated");
+}
+
+
 - (void)getDeviceInfo:(NSDictionary *)jsonObject {
 	NSString *m_platform = 0;
 	size_t size;
