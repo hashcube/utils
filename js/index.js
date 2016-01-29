@@ -74,7 +74,10 @@ exports = new (Class(function () {
     });
 
     pluginOn('performActionForShortcutItem', function (evt) {
-      log("Error in 3DTouch. This should not be executed");
+      pluginSend('logIt', {
+        'message':
+          "Error in 3DTouch => performActionForShortcutItem called. Please overwrite in the application"
+        });
     });
 
   };
