@@ -126,4 +126,8 @@ exports = new (Class(function () {
       pluginSend('getAdvertisingId');
     }
   };
+
+  this.updateShortcutItems = function (jsonObject) {
+    //dummy
+  };
 }))();
