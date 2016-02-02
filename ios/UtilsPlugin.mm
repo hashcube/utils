@@ -19,12 +19,12 @@
 }
 
 // Called from native-ios for 3D touch action
-- (void) performActionForShortcutItem:(NSString*) shortcutItem {
+- (void) performActionForShortcutItem:(UIApplicationShortcutItem *) shortcutItem {
     //Attempt to send to Application.js
     @try {
         [[PluginManager get] dispatchJSEvent:[NSDictionary dictionaryWithObjectsAndKeys:
             @"performActionForShortcutItem", @"name",
-            shortcutItem, @"val",
+            shortcutItem.type, @"val",
             nil]];
     }
     @catch (NSException *exception) {
