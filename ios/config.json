@@ -14,6 +14,7 @@
 	"plist": {
 		"NSAppTransportSecurity": {
 			"NSAllowsArbitraryLoads": true
-		}
+		},
+		"UIApplicationShortcutItems": []
 	}
 }
