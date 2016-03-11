@@ -105,10 +105,19 @@ public class UtilsPlugin implements IPlugin {
 		// Track app active events
 	}
 
+	public void onRenderResume() {
+	}
+
 	public void onStart() {
 	}
 
+	public void onFirstRun() {
+	}
+
 	public void onPause() {
+	}
+
+	public void onRenderPause() {
 	}
 
 	public void onStop() {
