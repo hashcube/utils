@@ -108,6 +108,7 @@
 	__autoreleasing NSError *error;
 	NSDate *installDate = [[[NSFileManager defaultManager] attributesOfItemAtPath:urlToDocumentsFolder.path
 										error:&error] objectForKey:NSFileCreationDate];
+	NSString * version =  [[[NSBundle mainBundle] infoDictionary] objectForKey: @"CFBundleShortVersionString"];
 
 	[[PluginManager get] dispatchJSEvent:[NSDictionary dictionaryWithObjectsAndKeys:
 		@"deviceInfo",@"name",
@@ -117,7 +118,7 @@
 		@"ios",@"store",
 		language,@"language",
 		[[UIDevice currentDevice] systemVersion],@"os",
-		[[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"],@"versionNumber",
+		version,@"versionNumber",
 		nil]];
 }
 
