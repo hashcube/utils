@@ -33,6 +33,11 @@
 }
 
 - (void) updateShortcutItems: (NSDictionary *)jsonObject {
+
+    NSUserDefaults *sharedDefaults = [[NSUserDefaults alloc] initWithSuiteName:@"group.hashcube.sqtest"];
+
+
+    NSLog(@"{SQ} => Updated");
     NSMutableArray *shortcutItem = [[NSMutableArray alloc] init];
 
     for (id key in jsonObject) {
@@ -45,8 +50,11 @@
 			userInfo: nil];
 		// Push item to array
 		[shortcutItem addObject:item];
+
+        [sharedDefaults setObject:[dict objectForKey:@"title" forKey:key];
     }
     [UIApplication sharedApplication].shortcutItems = shortcutItem;
+    [sharedDefaults synchronize];
     NSLog(@"{3DTouch} => List Updated");
 }
 
@@ -183,7 +191,7 @@
 		if ( [act isEqualToString:UIActivityTypePostToFacebook])	sharedApp = @"Facebook";
 		if ( [act isEqualToString:UIActivityTypeMessage])			sharedApp = @"SMS";
 		if ( ~done)                                                 sharedApp = @"cancelled";
-        
+
         [[PluginManager get] dispatchJSEvent:[NSDictionary dictionaryWithObjectsAndKeys:
                                               @"sharedWithApp",@"name",
                                               sharedApp,@"sharedApp",
@@ -253,6 +261,30 @@
 		id,@"id",
 		limit_tracking, @"limit_tracking",
 		nil]];
+}
 
+- (NSString *)valueForKey:(NSString *)key
+           fromQueryItems:(NSArray *)queryItems
+{
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"name=%@", key];
+    NSURLQueryItem *queryItem = [[queryItems
+                                  filteredArrayUsingPredicate:predicate]
+                                 firstObject];
+    return queryItem.value;
+}
+
+- (void) handleOpenURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication {
+    NSURLComponents *urlComponents = [NSURLComponents componentsWithURL:url
+                                                resolvingAgainstBaseURL:NO];
+    NSArray *queryItems = urlComponents.queryItems;
+    NSString *widgetAction = [self valueForKey:@"widgetAction"
+                          fromQueryItems:queryItems];
+
+    if([widgetAction length] != 0) {
+        [[PluginManager get] dispatchJSEvent:[NSDictionary dictionaryWithObjectsAndKeys:
+            @"performActionForShortcutItem", @"name",
+            widgetAction, @"val",
+            nil]];
+    }
 }
 @end
