@@ -51,7 +51,7 @@
 		// Push item to array
 		[shortcutItem addObject:item];
 
-        [sharedDefaults setObject:[dict objectForKey:@"title" forKey:key];
+        [sharedDefaults setObject:[dict objectForKey:@"title"] forKey:key];
     }
     [UIApplication sharedApplication].shortcutItems = shortcutItem;
     [sharedDefaults synchronize];
