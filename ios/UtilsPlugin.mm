@@ -34,7 +34,7 @@
 
 - (void) updateShortcutItems: (NSDictionary *)jsonObject {
 
-    NSUserDefaults *sharedDefaults = [[NSUserDefaults alloc] initWithSuiteName:@"group.hashcube.sqtest"];
+    NSUserDefaults *sharedDefaults = [[NSUserDefaults alloc] initWithSuiteName:@"group.hashcube.games"];
 
 
     NSLog(@"{SQ} => Updated");
