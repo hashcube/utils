@@ -33,7 +33,7 @@
 }
 
 - (void) updateShortcutItems: (NSDictionary *)jsonObject {
-    NSString *appGroup = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"AppGroup"];
+    NSString *appGroup = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"WidgetGroup"];
 
     NSUserDefaults *sharedDefaults = [[NSUserDefaults alloc] initWithSuiteName:appGroup];
 
