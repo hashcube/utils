@@ -33,7 +33,9 @@
 }
 
 - (void) updateShortcutItems: (NSDictionary *)jsonObject {
-    NSUserDefaults *sharedDefaults = [[NSUserDefaults alloc] initWithSuiteName:@"group.com.hashcube.sudokuquest"];
+    NSString *appGroup = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"AppGroup"];
+
+    NSUserDefaults *sharedDefaults = [[NSUserDefaults alloc] initWithSuiteName:appGroup];
 
     NSMutableArray *shortcutItem = [[NSMutableArray alloc] init];
 
