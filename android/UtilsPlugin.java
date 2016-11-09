@@ -16,6 +16,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.ShortcutManager;
 import android.content.pm.ShortcutInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.graphics.drawable.Icon;
 import com.google.android.gms.ads.identifier.AdvertisingIdClient;
 import com.google.android.gms.ads.identifier.AdvertisingIdClient.Info;
 
@@ -113,6 +114,7 @@ public class UtilsPlugin implements IPlugin {
 
 	public void onCreate(Activity activity, Bundle savedInstanceState) {
 		_activity = activity;
+		onNewIntent(activity.getIntent());
 	}
 
 	public void onResume() {
@@ -232,7 +234,7 @@ public class UtilsPlugin implements IPlugin {
 	}
 
 	public void onNewIntent(Intent gameIntent) {
-		logger.log("{utils-native} Inside onNewInntent");
+		logger.log("{utils-native} Inside onNewIntent");
 		if (gameIntent.getAction() == TeaLeaf.ACTION_SHORTCUT) {
 			logger.log("{utils-native} pushing shortcut action event");
 			EventQueue.pushEvent(new ShortcutEvent(gameIntent.getExtras().getString(TeaLeaf.SHORTCUT_KEY)));
@@ -255,14 +257,18 @@ public class UtilsPlugin implements IPlugin {
 				String key = (String)keys.next();
 				JSONObject data = shortcuts.getJSONObject(key);
                                 String title = data.getString("title");
+				logger.log("{utils-native} adding shortcut for : " + key);
 
-				Intent shortcutIntent = new Intent();
+				Intent shortcutIntent = _context.getPackageManager().getLaunchIntentForPackage(_context.getPackageName());
+				shortcutIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
 				shortcutIntent.setAction(TeaLeaf.ACTION_SHORTCUT);
 				shortcutIntent.putExtra(TeaLeaf.SHORTCUT_KEY, key);
 
 				ShortcutInfo shortcut = new ShortcutInfo.Builder(_activity, key)
                                 	.setShortLabel(title)
                                 	.setLongLabel(title)
+					.setIcon(Icon.createWithResource(_context, _context.getResources().getIdentifier("shortcut_" +
+						 data.getString("icon"), "drawable", _context.getPackageName())))
                                 	.setIntent(shortcutIntent)
 					.build();
 				shortcutList.add(shortcut);
@@ -270,6 +276,7 @@ public class UtilsPlugin implements IPlugin {
 
 			shortcutManager.setDynamicShortcuts(shortcutList);
 		} catch (Exception ex) {
+			logger.log("{utils-native} Exception creating shortcut... " + ex);
 		}
 	}
 }
