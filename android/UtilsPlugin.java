@@ -13,10 +13,15 @@ import android.content.Context;
 import android.net.Uri;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageInfo;
+import android.content.pm.ShortcutManager;
+import android.content.pm.ShortcutInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.graphics.drawable.Icon;
 import com.google.android.gms.ads.identifier.AdvertisingIdClient;
 import com.google.android.gms.ads.identifier.AdvertisingIdClient.Info;
 
+import java.util.List;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Locale;
 
@@ -90,6 +95,16 @@ public class UtilsPlugin implements IPlugin {
 		}
 	}
 
+	public class ShortcutEvent extends com.tealeaf.event.Event {
+		String val;
+
+		public ShortcutEvent(String val) {
+			super("performActionForShortcutItem");
+
+			this.val = val;
+		}
+	}
+
 	public UtilsPlugin() {
 	}
 
@@ -99,6 +114,7 @@ public class UtilsPlugin implements IPlugin {
 
 	public void onCreate(Activity activity, Bundle savedInstanceState) {
 		_activity = activity;
+		onNewIntent(activity.getIntent());
 	}
 
 	public void onResume() {
@@ -124,9 +140,6 @@ public class UtilsPlugin implements IPlugin {
 	}
 
 	public void onDestroy() {
-	}
-
-	public void onNewIntent(Intent intent) {
 	}
 
 	public void setInstallReferrer(String referrer) {
@@ -218,5 +231,52 @@ public class UtilsPlugin implements IPlugin {
 				EventQueue.pushEvent(new AdvertisingIdEvent(adId, isLAT));
 			}
 		}).start();
+	}
+
+	public void onNewIntent(Intent gameIntent) {
+		logger.log("{utils-native} Inside onNewIntent");
+		if (gameIntent.getAction() == TeaLeaf.ACTION_SHORTCUT) {
+			logger.log("{utils-native} pushing shortcut action event");
+			EventQueue.pushEvent(new ShortcutEvent(gameIntent.getExtras().getString(TeaLeaf.SHORTCUT_KEY)));
+		}
+	}
+
+	public void updateShortcutItems(String params) {
+		logger.log("{utils-native} Inside updateShortcutItems");
+		if (android.os.Build.VERSION.SDK_INT < 25) {
+			return;
+		}
+
+		try {
+			ShortcutManager shortcutManager = _activity.getSystemService(ShortcutManager.class);
+			JSONObject shortcuts = new JSONObject(params);
+			Iterator<?> keys = shortcuts.keys();
+			List<ShortcutInfo> shortcutList = new ArrayList<ShortcutInfo>();
+
+			while (keys.hasNext()) {
+				String key = (String)keys.next();
+				JSONObject data = shortcuts.getJSONObject(key);
+				String title = data.getString("title");
+				logger.log("{utils-native} adding shortcut for : " + key);
+
+				Intent shortcutIntent = _context.getPackageManager().getLaunchIntentForPackage(_context.getPackageName());
+				shortcutIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+				shortcutIntent.setAction(TeaLeaf.ACTION_SHORTCUT);
+				shortcutIntent.putExtra(TeaLeaf.SHORTCUT_KEY, key);
+
+				ShortcutInfo shortcut = new ShortcutInfo.Builder(_activity, key)
+                                	.setShortLabel(title)
+                                	.setLongLabel(title)
+					.setIcon(Icon.createWithResource(_context, _context.getResources().getIdentifier("shortcut_" +
+						 data.getString("icon"), "drawable", _context.getPackageName())))
+                                	.setIntent(shortcutIntent)
+					.build();
+				shortcutList.add(shortcut);
+			}
+
+			shortcutManager.setDynamicShortcuts(shortcutList);
+		} catch (Exception ex) {
+			logger.log("{utils-native} Exception creating shortcut... " + ex);
+		}
 	}
 }
