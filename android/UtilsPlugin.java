@@ -256,7 +256,7 @@ public class UtilsPlugin implements IPlugin {
 			while (keys.hasNext()) {
 				String key = (String)keys.next();
 				JSONObject data = shortcuts.getJSONObject(key);
-                                String title = data.getString("title");
+				String title = data.getString("title");
 				logger.log("{utils-native} adding shortcut for : " + key);
 
 				Intent shortcutIntent = _context.getPackageManager().getLaunchIntentForPackage(_context.getPackageName());
