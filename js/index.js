@@ -104,7 +104,7 @@ exports = new (Class(function () {
   this.showEnableNotificationPopup = function (title, message,
     open_btn, cancel_btn, callback) {
     var parameters = {'title': title, 'message': message,
-      'open_settings_btn_title': open_btn, 'cancel_btn_title': cancel_btn};
+      'open_btn_title': open_btn, 'cancel_btn_title': cancel_btn};
 
     cb_notif_enable_popup.push(callback)
     pluginSend('showEnableNotificationPopup', parameters);

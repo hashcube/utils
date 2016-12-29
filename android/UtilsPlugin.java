@@ -268,7 +268,7 @@ public class UtilsPlugin implements IPlugin {
 
 	public void showEnableNotificationPopup(String params) {
 		try {
-			String title = "", message = "", openSettingsBtnTitle = "";
+			String title = "", message = "", openBtnTitle = "";
 			JSONObject data = new JSONObject(params);
 			Iterator<?> keys = data.keys();
 			while( keys.hasNext() ){
@@ -282,21 +282,21 @@ public class UtilsPlugin implements IPlugin {
 					message = (String) o;
 					continue;
 				}
-				if(key.equals("open_settings_btn_title")){
-					openSettingsBtnTitle = (String) o;
+				if(key.equals("open_btn_title")){
+					openBtnTitle = (String) o;
 					continue;
 				}
 			}
 
 			final String ftitle = title;
 			final String fmessage = message;
-			final String fopenSettingsBtnTitle = openSettingsBtnTitle;
+			final String fopenBtnTitle = openBtnTitle;
 			_activity.runOnUiThread(new Runnable() {
 				public void run() {
 					new AlertDialog.Builder(_activity)
 					.setTitle(ftitle)
 					.setMessage(fmessage)
-					.setPositiveButton(fopenSettingsBtnTitle, new DialogInterface.OnClickListener() {
+					.setPositiveButton(fopenBtnTitle, new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int whichButton) {
 							EventQueue.pushEvent(new SettingsOpened());
 							openAppSettings();
