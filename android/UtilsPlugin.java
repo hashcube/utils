@@ -268,35 +268,16 @@ public class UtilsPlugin implements IPlugin {
 
 	public void showEnableNotificationPopup(String params) {
 		try {
-			String title = "", message = "", openBtnTitle = "";
 			JSONObject data = new JSONObject(params);
-			Iterator<?> keys = data.keys();
-			while( keys.hasNext() ){
-				String key = (String)keys.next();
-				Object o = data.get(key);
-				if(key.equals("title")){
-					title = (String) o;
-					continue;
-				}
-				if(key.equals("message")){
-					message = (String) o;
-					continue;
-				}
-				if(key.equals("open_btn_title")){
-					openBtnTitle = (String) o;
-					continue;
-				}
-			}
-
-			final String ftitle = title;
-			final String fmessage = message;
-			final String fopenBtnTitle = openBtnTitle;
+			final String title = data.optString("title", "");
+			final String message = data.optString("message", "");
+			final String openBtnTitle = data.optString("open_btn_title", "");
 			_activity.runOnUiThread(new Runnable() {
 				public void run() {
 					new AlertDialog.Builder(_activity)
-					.setTitle(ftitle)
-					.setMessage(fmessage)
-					.setPositiveButton(fopenBtnTitle, new DialogInterface.OnClickListener() {
+					.setTitle(title)
+					.setMessage(message)
+					.setPositiveButton(openBtnTitle, new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int whichButton) {
 							EventQueue.pushEvent(new SettingsOpened());
 							openAppSettings();

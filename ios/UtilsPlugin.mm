@@ -150,8 +150,8 @@ static UIViewController* rootViewController = nil;
 - (void)showEnableNotificationPopup: (NSDictionary *)jsonObject{
 	NSString *title =  @"";
 	NSString *message = @"";
-	NSString *open_settings_btn_title = @"";
-	NSString *cancel_btn_title = @"";
+	NSString *openBtnTitle = @"";
+	NSString *cancelBtnTitle = @"";
 
 	for (id key in jsonObject) {
 		id o = [jsonObject objectForKey:key];
@@ -163,12 +163,12 @@ static UIViewController* rootViewController = nil;
 			message = o;
 			continue;
 		}
-		if([key isEqual:@"open_settings_btn_title"]){
-			open_settings_btn_title = o;
+		if([key isEqual:@"open_btn_title"]){
+			openBtnTitle = o;
 			continue;
 		}
 		if([key isEqual:@"cancel_btn_title"]){
-			cancel_btn_title = o;
+			cancelBtnTitle = o;
 			continue;
 		}
 	}
@@ -178,7 +178,7 @@ static UIViewController* rootViewController = nil;
                                   preferredStyle:UIAlertControllerStyleAlert];
 
     UIAlertAction* ok = [UIAlertAction
-                         actionWithTitle:open_settings_btn_title
+                         actionWithTitle:openBtnTitle
                          style:UIAlertActionStyleDefault
                          handler:^(UIAlertAction * action)
                          {
@@ -194,7 +194,7 @@ static UIViewController* rootViewController = nil;
                              });
                         }];
     UIAlertAction* cancel = [UIAlertAction
-                             actionWithTitle:cancel_btn_title
+                             actionWithTitle:cancelBtnTitle
                              style:UIAlertActionStyleDefault
                              handler:^(UIAlertAction * action)
                              {
