@@ -148,13 +148,37 @@ static UIViewController* rootViewController = nil;
 }
 
 - (void)showEnableNotificationPopup: (NSDictionary *)jsonObject{
-    UIAlertController * alert=   [UIAlertController
-                                  alertControllerWithTitle:@"Enable Notifications"
-                                  message:@"To receive Sudoku of the Day everyday!"
+	NSString *title =  @"";
+	NSString *message = @"";
+	NSString *open_settings_btn_title = @"";
+	NSString *cancel_btn_title = @"";
+
+	for (id key in jsonObject) {
+		id o = [jsonObject objectForKey:key];
+		if([key isEqual:@"title"]){
+			title = o;
+			continue;
+		}
+		if([key isEqual:@"message"]){
+			message = o;
+			continue;
+		}
+		if([key isEqual:@"open_settings_btn_title"]){
+			open_settings_btn_title = o;
+			continue;
+		}
+		if([key isEqual:@"cancel_btn_title"]){
+			cancel_btn_title = o;
+			continue;
+		}
+	}
+    UIAlertController * alert = [UIAlertController
+                                  alertControllerWithTitle:title
+                                  message:message
                                   preferredStyle:UIAlertControllerStyleAlert];
 
     UIAlertAction* ok = [UIAlertAction
-                         actionWithTitle:@"Go to Settings"
+                         actionWithTitle:open_settings_btn_title
                          style:UIAlertActionStyleDefault
                          handler:^(UIAlertAction * action)
                          {
@@ -168,9 +192,9 @@ static UIViewController* rootViewController = nil;
                              dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
                                  [self openSettings];
                              });
-                         }];
+                        }];
     UIAlertAction* cancel = [UIAlertAction
-                             actionWithTitle:@"Cancel"
+                             actionWithTitle:cancel_btn_title
                              style:UIAlertActionStyleDefault
                              handler:^(UIAlertAction * action)
                              {

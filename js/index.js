@@ -101,9 +101,13 @@ exports = new (Class(function () {
     pluginSend('shareText', parameters);
   };
 
-  this.showEnableNotificationPopup = function (callback) {
+  this.showEnableNotificationPopup = function (title, message,
+    open_btn, cancel_btn, callback) {
+    var parameters = {'title': title, 'message': message,
+      'open_settings_btn_title': open_btn, 'cancel_btn_title': cancel_btn};
+
     cb_notif_enable_popup.push(callback)
-    pluginSend('showEnableNotificationPopup');
+    pluginSend('showEnableNotificationPopup', parameters);
   };
 
   this.getNotificationEnabledStatus = function (callback) {

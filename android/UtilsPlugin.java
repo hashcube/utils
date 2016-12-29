@@ -268,12 +268,35 @@ public class UtilsPlugin implements IPlugin {
 
 	public void showEnableNotificationPopup(String params) {
 		try {
+			String title = "", message = "", open_settings_btn_title = "";
+			JSONObject ogData = new JSONObject(params);
+			Iterator<?> keys = ogData.keys();
+			while( keys.hasNext() ){
+				String key = (String)keys.next();
+				Object o = ogData.get(key);
+				if(key.equals("title")){
+					title = (String) o;
+					continue;
+				}
+				if(key.equals("message")){
+					message = (String) o;
+					continue;
+				}
+				if(key.equals("open_settings_btn_title")){
+					open_settings_btn_title = (String) o;
+					continue;
+				}
+			}
+
+			final String ftitle = title;
+			final String fmessage = message;
+			final String fopen_settings_btn_title = open_settings_btn_title;
 			_activity.runOnUiThread(new Runnable() {
 				public void run() {
 					new AlertDialog.Builder(_activity)
-					.setTitle("Enable Notifications")
-					.setMessage("To receive Sudoku of the Day everyday!")
-					.setPositiveButton("Go to Settings", new DialogInterface.OnClickListener() {
+					.setTitle(ftitle)
+					.setMessage(fmessage)
+					.setPositiveButton(fopen_settings_btn_title, new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int whichButton) {
 							EventQueue.pushEvent(new SettingsOpened());
 							openAppSettings();
