@@ -27,6 +27,9 @@ import java.util.Locale;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.support.v4.app.NotificationManagerCompat;
 
 public class UtilsPlugin implements IPlugin {
 	Context _context;
@@ -102,6 +105,21 @@ public class UtilsPlugin implements IPlugin {
 			super("performActionForShortcutItem");
 
 			this.val = val;
+		}
+	}
+
+	public class SettingsOpened extends com.tealeaf.event.Event {
+		public SettingsOpened() {
+			super("SettingsOpened");
+		}
+	}
+
+	public class NotificationEnabledStatus extends com.tealeaf.event.Event {
+		boolean enabled;
+
+		public NotificationEnabledStatus(boolean enabled) {
+			super("NotificationEnabledStatus");
+			this.enabled = enabled;
 		}
 	}
 
@@ -239,6 +257,43 @@ public class UtilsPlugin implements IPlugin {
 			logger.log("{utils-native} pushing shortcut action event");
 			EventQueue.pushEvent(new ShortcutEvent(gameIntent.getExtras().getString(TeaLeaf.SHORTCUT_KEY)));
 		}
+	}
+
+	public void openAppSettings() {
+		Uri packageURI = Uri.parse("package:" + _context.getPackageName());
+		Intent intent = new Intent("android.settings.APPLICATION_DETAILS_SETTINGS", packageURI);
+		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		_context.startActivity(intent);
+	}
+
+	public void showEnableNotificationPopup(String params) {
+		try {
+			JSONObject data = new JSONObject(params);
+			final String title = data.optString("title", "");
+			final String message = data.optString("message", "");
+			final String openBtnTitle = data.optString("open_btn_title", "");
+			_activity.runOnUiThread(new Runnable() {
+				public void run() {
+					new AlertDialog.Builder(_activity)
+					.setTitle(title)
+					.setMessage(message)
+					.setPositiveButton(openBtnTitle, new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int whichButton) {
+							EventQueue.pushEvent(new SettingsOpened());
+							openAppSettings();
+					    }})
+					 .show();
+				}
+			});
+		} catch(Exception e) {
+			logger.log("{utils-native} Exception" + e);
+		}
+	}
+
+	public void getNotificationEnabledStatus(String params) {
+		logger.log("{utils-native} getNotificationEnabledStatus java");
+		NotificationManagerCompat n = NotificationManagerCompat.from(_activity);
+		EventQueue.pushEvent(new NotificationEnabledStatus(n.areNotificationsEnabled()));
 	}
 
 	public void updateShortcutItems(String params) {

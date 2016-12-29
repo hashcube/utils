@@ -2,6 +2,7 @@
 #import <sys/sysctl.h>
 #import <AdSupport/ASIdentifierManager.h>
 
+static UIViewController* rootViewController = nil;
 @implementation UtilsPlugin
 
 // The plugin must call super dealloc.
@@ -16,6 +17,9 @@
 		return nil;
 	}
 	return self;
+}
+- (void) initializeWithManifest:(NSDictionary *)manifest appDelegate:(TeaLeafAppDelegate *)appDelegate {
+    rootViewController = [[[UIApplication sharedApplication] keyWindow] rootViewController];
 }
 
 // Called from native-ios for 3D touch action
@@ -141,6 +145,97 @@
 	}
 
 	NSLog(@"{utils-native} LOGIT = %@", message);
+}
+
+- (void)showEnableNotificationPopup: (NSDictionary *)jsonObject{
+	NSString *title =  @"";
+	NSString *message = @"";
+	NSString *openBtnTitle = @"";
+	NSString *cancelBtnTitle = @"";
+
+	for (id key in jsonObject) {
+		id o = [jsonObject objectForKey:key];
+		if([key isEqual:@"title"]){
+			title = o;
+			continue;
+		}
+		if([key isEqual:@"message"]){
+			message = o;
+			continue;
+		}
+		if([key isEqual:@"open_btn_title"]){
+			openBtnTitle = o;
+			continue;
+		}
+		if([key isEqual:@"cancel_btn_title"]){
+			cancelBtnTitle = o;
+			continue;
+		}
+	}
+    UIAlertController * alert = [UIAlertController
+                                  alertControllerWithTitle:title
+                                  message:message
+                                  preferredStyle:UIAlertControllerStyleAlert];
+
+    UIAlertAction* ok = [UIAlertAction
+                         actionWithTitle:openBtnTitle
+                         style:UIAlertActionStyleDefault
+                         handler:^(UIAlertAction * action)
+                         {
+                             [[PluginManager get] dispatchJSEvent:[NSDictionary dictionaryWithObjectsAndKeys:
+                                                                   @"SettingsOpened",@"name",
+                                                                   nil]];
+
+                             [alert dismissViewControllerAnimated:YES completion:nil];
+                             double delayInSeconds = 1.0;
+                             dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
+                             dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+                                 [self openSettings];
+                             });
+                        }];
+    UIAlertAction* cancel = [UIAlertAction
+                             actionWithTitle:cancelBtnTitle
+                             style:UIAlertActionStyleDefault
+                             handler:^(UIAlertAction * action)
+                             {
+                                 [alert dismissViewControllerAnimated:YES completion:nil];
+                             }];
+
+    [alert addAction:ok];
+    [alert addAction:cancel];
+    [rootViewController presentViewController:alert animated:YES completion:nil];
+}
+
+- (void)openSettings {
+        if (&UIApplicationOpenSettingsURLString != nil) {
+            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:UIApplicationOpenSettingsURLString]];
+        } else {
+            NSLog(@"{utils-native} UIApplicationOpenSettingsURLString is not available in current iOS version");
+    }
+}
+
+- (void)getNotificationEnabledStatus: (NSDictionary *)jsonObject{
+    NSInteger isEnabled = 0;
+
+    if ([[UIApplication sharedApplication] respondsToSelector:@selector(currentUserNotificationSettings)]){
+        UIUserNotificationSettings *notificationSettings = [[UIApplication sharedApplication] currentUserNotificationSettings];
+        if (!notificationSettings || (notificationSettings.types == UIUserNotificationTypeNone)) {
+            isEnabled = 0;
+        } else {
+            isEnabled = 1;
+        }
+    } else {
+        UIRemoteNotificationType types = [[UIApplication sharedApplication] enabledRemoteNotificationTypes];
+        if (types & UIRemoteNotificationTypeAlert) {
+            isEnabled = 1;
+        } else {
+            isEnabled = 0;
+        }
+    }
+    [[PluginManager get] dispatchJSEvent:[NSDictionary dictionaryWithObjectsAndKeys:
+                                          @"NotificationEnabledStatus",@"name",
+                                          [NSNumber numberWithInt:isEnabled],@"enabled",
+                                          nil]];
 }
 
 - (void)shareText:(NSDictionary *)jsonObject {

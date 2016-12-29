@@ -12,6 +12,8 @@ exports = new (Class(function () {
     cb_jailbreak = [],
     cb_advt = [],
     cb_shared_app = [],
+    cb_notif_enable_popup = [],
+    cb_notif_enable_status = [],
     pluginSend = function (evt, params) {
       NATIVE.plugins.sendEvent('UtilsPlugin', evt,
           JSON.stringify(params || {}));
@@ -80,6 +82,14 @@ exports = new (Class(function () {
         });
     });
 
+    pluginOn('SettingsOpened', function () {
+      invokeCallbacks(cb_notif_enable_popup);
+    });
+
+    pluginOn('NotificationEnabledStatus', function (evt) {
+      invokeCallbacks(cb_notif_enable_status, true, evt.enabled);
+    });
+
   };
 
   this.shareText = function (message, url, callback) {
@@ -89,6 +99,20 @@ exports = new (Class(function () {
     cb_shared_app.push(callback)
 
     pluginSend('shareText', parameters);
+  };
+
+  this.showEnableNotificationPopup = function (title, message,
+    open_btn, cancel_btn, callback) {
+    var parameters = {'title': title, 'message': message,
+      'open_btn_title': open_btn, 'cancel_btn_title': cancel_btn};
+
+    cb_notif_enable_popup.push(callback)
+    pluginSend('showEnableNotificationPopup', parameters);
+  };
+
+  this.getNotificationEnabledStatus = function (callback) {
+    cb_notif_enable_status.push(callback);
+    pluginSend('getNotificationEnabledStatus');
   };
 
   this.getDeviceInfo = function (next) {
