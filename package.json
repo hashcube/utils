@@ -1,6 +1,6 @@
 {
   "name": "utils",
-  "version": "3.4.3",
+  "version": "3.4.4",
   "devkit": {
     "clientPaths": {
       "utils": "js"
