@@ -5,8 +5,7 @@
     "libraries": [
     ],
     "jars": [
-        "google-basement.jar",
-        "google-gms-ads.jar"
+        "google-basement.jar"
     ],
     "injectionXML": "manifest.xml",
 	"injectionXSL": "manifest.xsl"
