@@ -4,6 +4,8 @@ import com.tealeaf.logger;
 import com.tealeaf.TeaLeaf;
 import com.tealeaf.EventQueue;
 import com.tealeaf.plugin.IPlugin;
+import com.tealeaf.Settings;
+import com.tealeaf.TeaLeafReceiver;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -22,11 +24,15 @@ import com.google.android.gms.ads.identifier.AdvertisingIdClient.Info;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Locale;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONArray;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.support.v4.app.NotificationManagerCompat;
@@ -120,6 +126,24 @@ public class UtilsPlugin implements IPlugin {
 		public NotificationEnabledStatus(boolean enabled) {
 			super("NotificationEnabledStatus");
 			this.enabled = enabled;
+		}
+	}
+
+	public class AppsInstalled extends com.tealeaf.event.Event {
+		String apps;
+
+		public AppsInstalled(JSONArray appData) {
+			super("AppsInstalled");
+			this.apps = appData.toString();
+		}
+	}
+
+	public class AppFound extends com.tealeaf.event.Event {
+		boolean found;
+
+		public AppFound(boolean found) {
+			super("AppFound");
+			this.found = found;
 		}
 	}
 
@@ -333,5 +357,52 @@ public class UtilsPlugin implements IPlugin {
 		} catch (Exception ex) {
 			logger.log("{utils-native} Exception creating shortcut... " + ex);
 		}
+	}
+
+	public void getInstalledApps(String params) {
+                Settings settings = Settings.getInstance();
+		JSONArray appsList = new JSONArray();
+
+                if (settings == null) {
+                        Settings.build(_context);
+                        settings = Settings.getInstance();
+                }
+
+		try {
+			Set<String> appData = new HashSet<String>(Arrays.asList(settings.getString(TeaLeafReceiver.INSTALLED_APPS_KEY, "").trim().split(TeaLeafReceiver.PACKAGE_DELIMITER)));
+
+			for (String currApp: appData) {
+				JSONObject currObj = new JSONObject();
+				String[] data = currApp.split(TeaLeafReceiver.INSTALL_TIME_DELIMITER);
+				currObj.put("packageName", data[0]);
+				currObj.put("installTime", data[1]);
+				appsList.put(currObj);
+			}
+		} catch (JSONException e) {
+			logger.log("{utils-native} JSONException on getInstalledApps" + e);
+		} catch (NullPointerException e) {
+			logger.log("{utils-native} NullPointerException on getInstalledApps" + e);
+		} catch (Exception e) {
+			logger.log("{utils-native} Exception on getInstalledApps" + e);
+		}
+
+		EventQueue.pushEvent(new AppsInstalled(appsList));
+	}
+
+	public void isAppInstalled(String params) {
+		boolean available = false;
+
+		PackageManager pm = _context.getPackageManager();
+		try {
+			JSONObject data = new JSONObject(params);
+			pm.getPackageInfo(data.optString("packageName", ""), PackageManager.GET_ACTIVITIES);
+			available = true;
+		} catch (PackageManager.NameNotFoundException e) {
+			logger.log("{utils-native} app not available for package");
+		} catch (JSONException e) {
+			logger.log("{utils-native} isAppInstalled json exception" + e);
+		}
+
+		EventQueue.pushEvent(new AppFound(available));
 	}
 }
