@@ -41,6 +41,17 @@ public class UtilsPlugin implements IPlugin {
 	Context _context;
 	Activity _activity;
 
+	private Settings getSettings() {
+		Settings settings = Settings.getInstance();
+
+		if (settings == null) {
+			Settings.build(_context);
+			settings = Settings.getInstance();
+		}
+
+		return settings;
+	}
+
 	public class DeviceEvent extends com.tealeaf.event.Event {
 		String type;
 		String os;
@@ -49,6 +60,7 @@ public class UtilsPlugin implements IPlugin {
 		String store;
 		String language;
 		long installDate;
+		String installReferrer;
 
 		public DeviceEvent(Context context) {
 			super("deviceInfo");
@@ -75,6 +87,7 @@ public class UtilsPlugin implements IPlugin {
 			this.versionNumber = myVersionName;
 			this.installDate = firstInstallTime;
 			this.language = Locale.getDefault().getLanguage();
+			this.installReferrer = getSettings().getString("installReferrer.referrer", "");
 
 			try {
 				Bundle meta = packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA).metaData;
@@ -360,16 +373,10 @@ public class UtilsPlugin implements IPlugin {
 	}
 
 	public void getInstalledApps(String params) {
-                Settings settings = Settings.getInstance();
 		JSONArray appsList = new JSONArray();
 
-                if (settings == null) {
-                        Settings.build(_context);
-                        settings = Settings.getInstance();
-                }
-
 		try {
-			Set<String> appData = new HashSet<String>(Arrays.asList(settings.getString(TeaLeafReceiver.INSTALLED_APPS_KEY, "").trim().split(TeaLeafReceiver.PACKAGE_DELIMITER)));
+			Set<String> appData = new HashSet<String>(Arrays.asList(getSettings().getString(TeaLeafReceiver.INSTALLED_APPS_KEY, "").trim().split(TeaLeafReceiver.PACKAGE_DELIMITER)));
 
 			for (String currApp: appData) {
 				JSONObject currObj = new JSONObject();
