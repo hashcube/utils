@@ -46,7 +46,9 @@ exports = new (Class(function () {
         }
       }
       list.length = 0;
-    };
+    },
+    cb_installed_apps,
+    cb_app_found;
 
   this.init = function () {
     logger.log('Register for events');
@@ -90,6 +92,16 @@ exports = new (Class(function () {
       invokeCallbacks(cb_notif_enable_status, true, evt.enabled);
     });
 
+    pluginOn('AppsInstalled',  function (evt) {
+      log("installed_app data is: " + evt.apps);
+      var app_data = JSON.parse(evt.apps);
+
+      cb_installed_apps(app_data);
+    });
+
+    pluginOn('AppFound', function (evt) {
+      cb_app_found(evt.found);
+    });
   };
 
   this.shareText = function (message, url, callback) {
@@ -163,6 +175,21 @@ exports = new (Class(function () {
     log('Updating shortcut Items');
 
     pluginSend('updateShortcutItems', jsonObject);
+  };
+
+  this.getInstalledApps = function (cb) {
+    log('get other installed apps');
+
+    cb_installed_apps = cb;
+    pluginSend('getInstalledApps');
+  };
+
+  this.isAppInstalled = function (packageName, cb) {
+    log("is app installed: " + packageName);
+    cb_app_found = cb;
+    pluginSend('isAppInstalled', {
+      packageName: packageName
+    });
   };
 
 }))();
