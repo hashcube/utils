@@ -184,11 +184,11 @@ exports = new (Class(function () {
     pluginSend('getInstalledApps');
   };
 
-  this.isAppInstalled = function (packageName, cb) {
-    log("is app installed: " + packageName);
+  this.isAppInstalled = function (identifier, cb) {
+    log("is app installed: " + identifier);
     cb_app_found = cb;
     pluginSend('isAppInstalled', {
-      packageName: packageName
+      identifier: identifier
     });
   };
 

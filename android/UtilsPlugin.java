@@ -402,7 +402,9 @@ public class UtilsPlugin implements IPlugin {
 		PackageManager pm = _context.getPackageManager();
 		try {
 			JSONObject data = new JSONObject(params);
-			pm.getPackageInfo(data.optString("packageName", ""), PackageManager.GET_ACTIVITIES);
+			String packageName = data.optString("identifier", "");
+
+			pm.getPackageInfo(packageName, PackageManager.GET_ACTIVITIES);
 			available = true;
 		} catch (PackageManager.NameNotFoundException e) {
 			logger.log("{utils-native} app not available for package");

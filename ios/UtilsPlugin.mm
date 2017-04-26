@@ -103,6 +103,14 @@ static UIViewController* rootViewController = nil;
     }
 }
 
+- (void)isAppInstalled: (NSDictionary *)jsonObject {
+    NSString *scheme = [NSString stringWithFormat:@"%@%@", [jsonObject objectForKey:@"identifier"], @"://"];
+
+	[[PluginManager get] dispatchJSEvent:[NSDictionary dictionaryWithObjectsAndKeys:
+        @"AppFound",@"name",
+		@([[UIApplication sharedApplication] canOpenURL: [NSURL URLWithString: scheme]]), @"found",
+		nil]];
+}
 
 - (void)getDeviceInfo:(NSDictionary *)jsonObject {
 	NSString *m_platform = 0;
