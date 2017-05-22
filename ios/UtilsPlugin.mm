@@ -358,6 +358,9 @@ static UIViewController* rootViewController = nil;
 	if([[ASIdentifierManager sharedManager] isAdvertisingTrackingEnabled]) {
 		limit_tracking = @"0";
 	}
+    else if([id isEqualToString :@"00000000-0000-0000-0000-000000000000"]){
+        id = [[[UIDevice currentDevice] identifierForVendor] UUIDString];
+    }
 	[[PluginManager get] dispatchJSEvent:[NSDictionary dictionaryWithObjectsAndKeys:
 		@"utilsAdvertisingId",@"name",
 		id,@"id",
