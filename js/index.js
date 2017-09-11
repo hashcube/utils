@@ -127,6 +127,12 @@ exports = new (Class(function () {
     pluginSend('getNotificationEnabledStatus');
   };
 
+  this.requestForReview = function () {
+    log('requesting for Review');
+
+    pluginSend('requestForReview');
+  };
+
   this.getDeviceInfo = function (next) {
     log('Getting device details');
 
