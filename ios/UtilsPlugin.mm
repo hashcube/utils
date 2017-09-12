@@ -1,6 +1,7 @@
 #import "UtilsPlugin.h"
 #import <sys/sysctl.h>
 #import <AdSupport/ASIdentifierManager.h>
+#import <StoreKit/StoreKit.h>
 
 static UIViewController* rootViewController = nil;
 @implementation UtilsPlugin
@@ -389,6 +390,12 @@ static UIViewController* rootViewController = nil;
             @"performActionForShortcutItem", @"name",
             widgetAction, @"val",
             nil]];
+    }
+}
+
+- (void) requestForReview:(NSDictionary *)jsonObject {
+    if([SKStoreReviewController class]){
+        [SKStoreReviewController requestReview];
     }
 }
 @end
