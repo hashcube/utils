@@ -388,7 +388,6 @@ public class UtilsPlugin implements IPlugin {
                     currObj.put("packageName", appInfo.packageName);
                     long installed = getAppFirstInstallTime(_context, appInfo.packageName);
                     currObj.put("installTime", installed);
-                    Log.e("getInstalledApps", appInfo.packageName + " " + installed);
                     appsList.put(currObj);
                 } catch (JSONException e) {
                     logger.log("{utils-native} JSONException on getInstalledApps" + e);
