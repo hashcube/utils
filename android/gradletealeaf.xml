@@ -1,0 +1,4 @@
+//<!--START_PLUGINS_DEPENDENCIES-->
+	//<!--Utils plugins Dependencies-->
+    implementation 'com.google.android.gms:play-services-analytics:16.0.0'
+//<!--END_PLUGINS_DEPENDENCIES-->
