@@ -45,234 +45,234 @@ import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
 
 public class UtilsPlugin implements IPlugin {
-    Context _context;
-    Activity _activity;
+            Context _context;
+            Activity _activity;
 
-    private Settings getSettings() {
-        Settings settings = Settings.getInstance();
+        private Settings getSettings() {
+            Settings settings = Settings.getInstance();
 
-        if (settings == null) {
-            Settings.build(_context);
-            settings = Settings.getInstance();
+            if (settings == null) {
+                Settings.build(_context);
+                settings = Settings.getInstance();
+            }
+
+            return settings;
         }
 
-        return settings;
-    }
+        public class DeviceEvent extends com.tealeaf.event.Event {
+            String type;
+            String os;
+            String device;
+            String versionNumber;
+            String store;
+            String language;
+            long installDate;
+            String installReferrer;
 
-    public class DeviceEvent extends com.tealeaf.event.Event {
-        String type;
-        String os;
-        String device;
-        String versionNumber;
-        String store;
-        String language;
-        long installDate;
-        String installReferrer;
-
-        public DeviceEvent(Context context) {
-            super("deviceInfo");
-            PackageManager packageManager = context.getPackageManager();
-            String packageName = context.getPackageName();
-            String myVersionName = "not available";
-            long firstInstallTime = -1;
+            public DeviceEvent(Context context) {
+                super("deviceInfo");
+                PackageManager packageManager = context.getPackageManager();
+                String packageName = context.getPackageName();
+                String myVersionName = "not available";
+                long firstInstallTime = -1;
 
 
+                try {
+                    PackageInfo packageInfo = packageManager.getPackageInfo(packageName, 0);
+                    myVersionName = packageInfo.versionName;
+                    //dividing by thousand to convert milliseconds to seconds
+                    firstInstallTime = packageInfo.firstInstallTime;
+                } catch (PackageManager.NameNotFoundException e) {
+                    e.printStackTrace();
+                }
+                this.type = "android";
+                if (android.os.Build.BRAND.equalsIgnoreCase("Amazon")) {
+                    this.type = "kindle";
+                }
+                this.os = android.os.Build.VERSION.RELEASE;
+                this.device = android.os.Build.MODEL;
+                this.versionNumber = myVersionName;
+                this.installDate = firstInstallTime;
+                this.language = Locale.getDefault().getLanguage();
+                this.installReferrer = getSettings().getString("installReferrer.referrer", "");
+
+                try {
+                    Bundle meta = packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA).metaData;
+                    if (meta != null) {
+                        this.store = meta.get("INSTALL_STORE").toString();
+                    }
+                } catch (Exception e) {
+                    logger.log("{utils-native} Exception on start:", e.getMessage());
+                }
+            }
+        }
+
+        public class AdvertisingIdEvent extends com.tealeaf.event.Event {
+            String id;
+            int limit_tracking;
+
+            public AdvertisingIdEvent(String id, boolean limit) {
+                super("utilsAdvertisingId");
+
+                this.id = id;
+                this.limit_tracking = limit ? 1 : 0;
+            }
+        }
+
+        public class ShortcutEvent extends com.tealeaf.event.Event {
+            String val;
+
+            public ShortcutEvent(String val) {
+                super("performActionForShortcutItem");
+
+                this.val = val;
+            }
+        }
+
+        public class SettingsOpened extends com.tealeaf.event.Event {
+            public SettingsOpened() {
+                super("SettingsOpened");
+            }
+        }
+
+        public class NotificationEnabledStatus extends com.tealeaf.event.Event {
+            boolean enabled;
+
+            public NotificationEnabledStatus(boolean enabled) {
+                super("NotificationEnabledStatus");
+                this.enabled = enabled;
+            }
+        }
+
+        public class AppsInstalled extends com.tealeaf.event.Event {
+            String apps;
+
+            public AppsInstalled(JSONArray appData) {
+                super("AppsInstalled");
+                this.apps = appData.toString();
+            }
+        }
+
+        public class AppFound extends com.tealeaf.event.Event {
+            boolean found;
+
+            public AppFound(boolean found) {
+                super("AppFound");
+                this.found = found;
+            }
+        }
+
+        public UtilsPlugin() {
+        }
+
+        public void onCreateApplication(Context applicationContext) {
+            _context = applicationContext;
+        }
+
+        public void onCreate(Activity activity, Bundle savedInstanceState) {
+            _activity = activity;
+            onNewIntent(activity.getIntent());
+        }
+
+        public void onResume() {
+            // Track app active events
+        }
+
+        public void onRenderResume() {
+        }
+
+        public void onStart() {
+        }
+
+        public void onFirstRun() {
+        }
+
+        public void onPause() {
+        }
+
+        public void onRenderPause() {
+        }
+
+        public void onStop() {
+        }
+
+        public void onDestroy() {
+        }
+
+        public void setInstallReferrer(String referrer) {
+        }
+
+        public void onActivityResult(Integer request, Integer result, Intent data) {
+        }
+
+        public boolean consumeOnBackPressed() {
+            return true;
+        }
+
+        public void onBackPressed() {
+        }
+
+        public void logError(String errorDesc) {
+            logger.log("{utils-native} logError " + errorDesc);
+        }
+
+        public void getDeviceInfo(String dummy) {
+            EventQueue.pushEvent(new DeviceEvent(_context));
+        }
+
+        public void logIt(String json) {
+            String shareText = "";
             try {
-                PackageInfo packageInfo = packageManager.getPackageInfo(packageName, 0);
-                myVersionName = packageInfo.versionName;
-                //dividing by thousand to convert milliseconds to seconds
-                firstInstallTime = packageInfo.firstInstallTime;
-            } catch (PackageManager.NameNotFoundException e) {
-                e.printStackTrace();
+                JSONObject ogData = new JSONObject(json);
+                Iterator<?> keys = ogData.keys();
+                while (keys.hasNext()) {
+                    String key = (String) keys.next();
+                    Object o = ogData.get(key);
+                    if (key.equals("message")) {
+                        shareText = (String) o;
+                        continue;
+                    }
+                }
+            } catch (JSONException e) {
+                logger.log("{utils-native} Error in Params of logIt because " + e.getMessage());
             }
-            this.type = "android";
-            if (android.os.Build.BRAND.equalsIgnoreCase("Amazon")) {
-                this.type = "kindle";
-            }
-            this.os = android.os.Build.VERSION.RELEASE;
-            this.device = android.os.Build.MODEL;
-            this.versionNumber = myVersionName;
-            this.installDate = firstInstallTime;
-            this.language = Locale.getDefault().getLanguage();
-            this.installReferrer = getSettings().getString("installReferrer.referrer", "");
+            logger.log("{utils-native} LOGIT = " + shareText);
+        }
 
+        public void shareText(String param) {
+            logger.log("{utils-native} Inside shareText");
+            String shareText = "", shareURL = "";
             try {
-                Bundle meta = packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA).metaData;
-                if (meta != null) {
-                    this.store = meta.get("INSTALL_STORE").toString();
+                JSONObject ogData = new JSONObject(param);
+                Iterator<?> keys = ogData.keys();
+                while (keys.hasNext()) {
+                    String key = (String) keys.next();
+                    Object o = ogData.get(key);
+                    if (key.equals("message")) {
+                        shareText = (String) o;
+                        continue;
+                    }
+                    if (key.equals("url")) {
+                        shareURL = (String) o;
+                        continue;
+                    }
                 }
-            } catch (Exception e) {
-                logger.log("{utils-native} Exception on start:", e.getMessage());
+            } catch (JSONException e) {
+                logger.log("{utils-native} Error in Params of shareText because " + e.getMessage());
             }
+            Intent sendIntent = new Intent();
+            sendIntent.setAction(Intent.ACTION_SEND);
+            sendIntent.putExtra(Intent.EXTRA_TEXT, shareText + " : (" + shareURL + ") #sudoku #sudokuquest");
+            sendIntent.setType("text/plain");
+            _activity.startActivity(Intent.createChooser(sendIntent, "Spread the word"));
         }
-    }
 
-    public class AdvertisingIdEvent extends com.tealeaf.event.Event {
-        String id;
-        int limit_tracking;
+        public void getAdvertisingId(String dummy) {
 
-        public AdvertisingIdEvent(String id, boolean limit) {
-            super("utilsAdvertisingId");
-
-            this.id = id;
-            this.limit_tracking = limit ? 1 : 0;
-        }
-    }
-
-    public class ShortcutEvent extends com.tealeaf.event.Event {
-        String val;
-
-        public ShortcutEvent(String val) {
-            super("performActionForShortcutItem");
-
-            this.val = val;
-        }
-    }
-
-    public class SettingsOpened extends com.tealeaf.event.Event {
-        public SettingsOpened() {
-            super("SettingsOpened");
-        }
-    }
-
-    public class NotificationEnabledStatus extends com.tealeaf.event.Event {
-        boolean enabled;
-
-        public NotificationEnabledStatus(boolean enabled) {
-            super("NotificationEnabledStatus");
-            this.enabled = enabled;
-        }
-    }
-
-    public class AppsInstalled extends com.tealeaf.event.Event {
-        String apps;
-
-        public AppsInstalled(JSONArray appData) {
-            super("AppsInstalled");
-            this.apps = appData.toString();
-        }
-    }
-
-    public class AppFound extends com.tealeaf.event.Event {
-        boolean found;
-
-        public AppFound(boolean found) {
-            super("AppFound");
-            this.found = found;
-        }
-    }
-
-    public UtilsPlugin() {
-    }
-
-    public void onCreateApplication(Context applicationContext) {
-        _context = applicationContext;
-    }
-
-    public void onCreate(Activity activity, Bundle savedInstanceState) {
-        _activity = activity;
-        onNewIntent(activity.getIntent());
-    }
-
-    public void onResume() {
-        // Track app active events
-    }
-
-    public void onRenderResume() {
-    }
-
-    public void onStart() {
-    }
-
-    public void onFirstRun() {
-    }
-
-    public void onPause() {
-    }
-
-    public void onRenderPause() {
-    }
-
-    public void onStop() {
-    }
-
-    public void onDestroy() {
-    }
-
-    public void setInstallReferrer(String referrer) {
-    }
-
-    public void onActivityResult(Integer request, Integer result, Intent data) {
-    }
-
-    public boolean consumeOnBackPressed() {
-        return true;
-    }
-
-    public void onBackPressed() {
-    }
-
-    public void logError(String errorDesc) {
-        logger.log("{utils-native} logError " + errorDesc);
-    }
-
-    public void getDeviceInfo(String dummy) {
-        EventQueue.pushEvent(new DeviceEvent(_context));
-    }
-
-    public void logIt(String json) {
-        String shareText = "";
-        try {
-            JSONObject ogData = new JSONObject(json);
-            Iterator<?> keys = ogData.keys();
-            while (keys.hasNext()) {
-                String key = (String) keys.next();
-                Object o = ogData.get(key);
-                if (key.equals("message")) {
-                    shareText = (String) o;
-                    continue;
-                }
-            }
-        } catch (JSONException e) {
-            logger.log("{utils-native} Error in Params of logIt because " + e.getMessage());
-        }
-        logger.log("{utils-native} LOGIT = " + shareText);
-    }
-
-    public void shareText(String param) {
-        logger.log("{utils-native} Inside shareText");
-        String shareText = "", shareURL = "";
-        try {
-            JSONObject ogData = new JSONObject(param);
-            Iterator<?> keys = ogData.keys();
-            while (keys.hasNext()) {
-                String key = (String) keys.next();
-                Object o = ogData.get(key);
-                if (key.equals("message")) {
-                    shareText = (String) o;
-                    continue;
-                }
-                if (key.equals("url")) {
-                    shareURL = (String) o;
-                    continue;
-                }
-            }
-        } catch (JSONException e) {
-            logger.log("{utils-native} Error in Params of shareText because " + e.getMessage());
-        }
-        Intent sendIntent = new Intent();
-        sendIntent.setAction(Intent.ACTION_SEND);
-        sendIntent.putExtra(Intent.EXTRA_TEXT, shareText + " : (" + shareURL + ") #sudoku #sudokuquest");
-        sendIntent.setType("text/plain");
-        _activity.startActivity(Intent.createChooser(sendIntent, "Spread the word"));
-    }
-
-    public void getAdvertisingId(String dummy) {
-
-        new Thread(new Runnable() {
-            public void run() {
-                String adId = "";
-                boolean isLAT = true;
+            new Thread(new Runnable() {
+                public void run() {
+                    String adId = "";
+                    boolean isLAT = true;
 
                 try {
                     if (android.os.Build.MANUFACTURER.equals("Amazon")) {

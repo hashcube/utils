@@ -1,8 +1,8 @@
 {
-    "copyFiles": [
-        "UtilsPlugin.java"
-    ],
-    "injectionXML": "manifest.xml",
+	"copyFiles": [
+		"UtilsPlugin.java"
+	],
+	"injectionXML": "manifest.xml",
 	"injectionXSL": "manifest.xsl",
 	"injectionTealeafModuleGradleXML": "gradletealeaf.xml"
 }
