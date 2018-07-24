@@ -1,12 +1,8 @@
 {
-    "copyFiles": [
-        "UtilsPlugin.java"
-    ],
-    "libraries": [
-    ],
-    "jars": [
-        "google-basement.jar"
-    ],
-    "injectionXML": "manifest.xml",
-	"injectionXSL": "manifest.xsl"
+	"copyFiles": [
+		"UtilsPlugin.java"
+	],
+	"injectionXML": "manifest.xml",
+	"injectionXSL": "manifest.xsl",
+	"injectionTealeafModuleGradleXML": "gradletealeaf.xml"
 }
