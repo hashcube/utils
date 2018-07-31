@@ -7,7 +7,7 @@
 	<xsl:template match="comment()" />
 
 	<xsl:template match="meta-data[@android:name='INSTALL_STORE']">
-		<meta-data android:name="INSTALL_STORE" android:value="\ {$install_store}"/>
+		<meta-data android:name="INSTALL_STORE" android:value="\{$install_store}"/>
 	</xsl:template>
 
 	<xsl:template match="@*|node()">
