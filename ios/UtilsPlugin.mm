@@ -130,6 +130,14 @@ static UIViewController* rootViewController = nil;
     error:&error] objectForKey:NSFileCreationDate];
   NSString * version =  [[[NSBundle mainBundle] infoDictionary] objectForKey: @"CFBundleShortVersionString"];
 
+  CGFloat topPadding = 0;
+  CGFloat bottomPadding = 0;
+  if (@available(iOS 11.0, *)) {
+    UIWindow *window = UIApplication.sharedApplication.keyWindow;
+    topPadding = window.safeAreaInsets.top;
+    bottomPadding = window.safeAreaInsets.bottom;
+  }
+
   [[PluginManager get] dispatchJSEvent:[NSDictionary dictionaryWithObjectsAndKeys:
     @"deviceInfo",@"name",
     m_platform,@"device",
@@ -139,6 +147,8 @@ static UIViewController* rootViewController = nil;
     language,@"language",
     [[UIDevice currentDevice] systemVersion],@"os",
     version,@"versionNumber",
+    @(topPadding),@"topPadding",
+    @(bottomPadding),@"bottomPadding",
     nil]];
 }
 
